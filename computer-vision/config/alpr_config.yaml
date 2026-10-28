@@ -1,0 +1,77 @@
+# ALPR System Configuration
+# Modular configuration for Computer Vision pipeline
+
+system:
+  device: "auto"        # 'auto', 'mps' (Apple Silicon), 'cuda', or 'cpu'
+  debug: false
+  save_output_video: true
+  export_csv: true
+  export_json: true
+
+video:
+  input_path: "data/input/sample.mp4"
+  output_dir: "data/output"
+  target_fps: null      # null to preserve original FPS, or specify e.g. 15, 30
+
+vehicle_detection:
+  model_name: "yolov8n.pt" # Official ultralytics pre-trained weights (COCO)
+  confidence_threshold: 0.5
+  iou_threshold: 0.45
+  target_classes:
+    - 2  # car
+    - 5  # bus
+    - 7  # truck
+  crop_padding_px: 10   # Padding around detected vehicle
+
+plate_detection:
+  model_path: "models/weights/plate_detector_yolo.pt" # Custom or dedicated plate detection weights
+  confidence_threshold: 0.4
+  iou_threshold: 0.4
+  fallback_to_vehicle_crop: true # Run plate detector inside vehicle bbox
+  min_aspect_ratio: 1.5          # Brazilian plates standard aspect ratio bounds
+  max_aspect_ratio: 4.5
+
+preprocessor:
+  target_width: 200
+  target_height: 64
+  grayscale: true
+  normalize: true
+  gaussian_blur:
+    enabled: true
+    kernel_size: [3, 3]
+  contrast_adjustment:
+    method: "clahe"     # 'clahe' (Contrast Limited Adaptive Histogram Equalization) or 'none'
+    clip_limit: 2.0
+    tile_grid_size: [8, 8]
+  binarization:
+    enabled: false      # Optional Otsu thresholding; keep false by default to retain gradient details for CRNN
+    method: "otsu"
+
+plate_recognition:
+  model_path: "models/weights/crnn_plate_recognition.pth"
+  img_height: 32
+  img_width: 128
+  character_set: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ" # Standard alphanumeric for Brazilian plates
+  decode_method: "ctc_greedy"                           # 'ctc_greedy' or 'beam_search'
+  min_ocr_confidence: 0.60
+
+plate_validator:
+  allowed_patterns:
+    - "mercosul"  # [A-Z]{3}[0-9][A-Z][0-9]{2} e.g. ABC1D23
+    - "antigo"    # [A-Z]{3}[0-9]{4} e.g. ABC1234
+  strip_special_chars: true
+
+tracker:
+  method: "iou_centroid"     # Tracking method
+  max_disappeared_frames: 15 # Frames to keep track without detection
+  confirmation_hits: 3       # Minimum consistent plate detections before confirming event
+  cooldown_seconds: 10.0     # Minimum time between duplicate event triggers for same plate
+
+visualizer:
+  draw_vehicle_bbox: true
+  draw_plate_bbox: true
+  draw_labels: true
+  font_scale: 0.6
+  bbox_thickness: 2
+  vehicle_box_color: [0, 165, 255] # BGR - Orange
+  plate_box_color: [0, 255, 0]     # BGR - Green
