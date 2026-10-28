@@ -141,3 +141,4 @@ class VehicleDetector:
             )
 
         return detections
+

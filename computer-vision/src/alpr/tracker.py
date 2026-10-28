@@ -273,3 +273,4 @@ class VehicleTracker:
             del self.tracks[tid]
 
         return new_confirmed_events
+

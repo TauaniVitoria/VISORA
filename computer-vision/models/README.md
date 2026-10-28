@@ -78,3 +78,4 @@ O módulo `PlateValidator` aplica expressões regulares sem substituição arbit
 - **Padrão Mercosul:** `^[A-Z]{3}[0-9][A-Z][0-9]{2}$` (exemplo: `BRA2E19`)
 - **Padrão Antigo (Cinza):** `^[A-Z]{3}[0-9]{4}$` (exemplo: `ABC1234`)
 - Entradas que não correspondam exatamente a 7 caracteres alfanuméricos são registradas como inválidas, garantindo a integridade dos dados e prevenindo erros de bilhetagem.
+

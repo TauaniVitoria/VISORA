@@ -158,3 +158,4 @@ class VideoReader:
 
     def __del__(self) -> None:
         self.release()
+

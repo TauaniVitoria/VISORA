@@ -66,3 +66,4 @@ def test_plate_detector_coordinate_translation_and_aspect_ratio():
     # vx1 + lx2 = 200 + 200 = 400; vy1 + ly2 = 300 + 300 = 600
     assert p.bbox == (250, 550, 400, 600)
     assert p.crop.shape == (50, 150, 3)
+

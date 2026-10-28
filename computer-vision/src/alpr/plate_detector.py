@@ -185,3 +185,4 @@ class PlateDetector:
             vehicle_bbox=(0, 0, w_orig, h_orig),
             frame_shape=(h_orig, w_orig),
         )
+

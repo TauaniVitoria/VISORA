@@ -253,3 +253,4 @@ class PlateRecognizer:
             raw_characters=decoded_text,
             is_trained_weights=True,
         )
+

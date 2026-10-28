@@ -87,3 +87,4 @@ def test_video_reader_release(synthetic_video_file: Path):
     assert reader._cap is not None and reader._cap.isOpened()
     reader.release()
     assert reader._cap is None
+

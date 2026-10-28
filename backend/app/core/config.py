@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "parkingsaas_db"
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/parkingsaas_db"
+    DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost:5432/parkingsaas_db"
 
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [

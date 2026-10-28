@@ -53,3 +53,4 @@ def test_vehicle_detector_cropping_and_clamping():
         assert d.bbox == (50, 60, 150, 160)
         # Com padding de 10px: y de 50 a 170 (altura 120), x de 40 a 160 (largura 120)
         assert d.crop.shape == (120, 120, 3)
+

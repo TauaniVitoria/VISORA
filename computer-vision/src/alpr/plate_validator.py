@@ -125,3 +125,4 @@ class PlateValidator:
             raw_text=raw_text,
             error_message="Sequência de caracteres não corresponde aos padrões Mercosul (ABC1D23) nem Antigo (ABC1234).",
         )
+

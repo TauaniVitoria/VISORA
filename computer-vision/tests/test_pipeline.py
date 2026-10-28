@@ -73,3 +73,4 @@ def test_pipeline_end_to_end_execution(synthetic_test_video: Path, tmp_path: Pat
     assert "metrics" in json_data
     assert "events" in json_data
     assert json_data["metrics"]["total_frames_processed"] == 5
+

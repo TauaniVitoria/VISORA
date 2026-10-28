@@ -62,3 +62,4 @@ def test_image_preprocessor_with_binarization():
     # Valores binários únicos após Otsu (0 e 255)
     unique_vals = set(np.unique(res.processed))
     assert unique_vals.issubset({0, 255})
+

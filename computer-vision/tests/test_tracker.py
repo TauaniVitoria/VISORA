@@ -121,3 +121,4 @@ def test_tracker_removes_dead_tracks():
     # 3º quadro sem detecção (excedeu max_disappeared_frames = 2)
     tracker.update([], [], frame_idx=4, timestamp_sec=0.3)
     assert len(tracker.tracks) == 0
+

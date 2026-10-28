@@ -61,3 +61,4 @@ def test_plate_recognizer_untrained_weights_mode():
     res = recognizer.recognize(fake_input)
     assert not res.is_trained_weights
     assert isinstance(res.text, str)
+

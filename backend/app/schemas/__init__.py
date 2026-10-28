@@ -1,1 +1,5 @@
-"""Pydantic request and response schemas."""
+"""
+Exportação dos esquemas Pydantic.
+"""
+
+from app.schemas.schemas import *

@@ -118,3 +118,4 @@ class ImagePreprocessor:
             normalized=normalized,
             target_size=(self.target_width, self.target_height),
         )
+
