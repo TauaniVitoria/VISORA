@@ -147,3 +147,4 @@ export interface AuditoriaLog {
   ip_origem?: string;
   criado_em: string;
 }
+

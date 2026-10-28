@@ -145,3 +145,4 @@ export class ApiService {
     return this.http.get<AuditoriaLog[]>(`${this.baseUrl}/audit/`);
   }
 }
+

@@ -129,3 +129,4 @@ import { AuthService } from '../../core/services/auth.service';
 export class SidebarComponent {
   authService = inject(AuthService);
 }
+
