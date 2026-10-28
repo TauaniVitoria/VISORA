@@ -1,0 +1,15 @@
+<div class="app-layout" *ngIf="authService.isAuthenticated(); else unauthenticated">
+  <app-navbar></app-navbar>
+  <div class="layout-body">
+    <app-sidebar></app-sidebar>
+    <main class="content-container">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<ng-template #unauthenticated>
+  <div class="auth-wrapper">
+    <router-outlet></router-outlet>
+  </div>
+</ng-template>
