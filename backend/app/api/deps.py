@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.core.database import get_db
 from app.core.security import decode_access_token
-from app.models.entities import Cliente, Usuario, UsuarioPerfil
+from app.models.entities import Cliente, Estacionamento, Usuario, UsuarioPerfil
 
 security_bearer = HTTPBearer(auto_error=True)
 
@@ -76,11 +76,12 @@ def require_roles(*allowed_roles: UsuarioPerfil):
 def get_current_tenant_id(
     current_user: Usuario = Depends(get_current_user),
     x_tenant_id: Optional[str] = Header(None, alias="X-Tenant-ID"),
+    db: Session = Depends(get_db),
 ) -> uuid.UUID:
     """
     Garante o isolamento multi-tenant.
     Para administradores de estacionamento e clientes, o tenant é estritamente o do seu cadastro.
-    Para o SAAS_ADMIN, permite navegar especificando o header X-Tenant-ID.
+    Para o SAAS_ADMIN, permite navegar especificando o header X-Tenant-ID ou usar o estacionamento padrão.
     """
     if current_user.perfil == UsuarioPerfil.SAAS_ADMIN.value:
         if x_tenant_id:
@@ -93,6 +94,12 @@ def get_current_tenant_id(
                 )
         if current_user.estacionamento_id:
             return current_user.estacionamento_id
+
+        # Fallback para o primeiro estacionamento cadastrado
+        first_est = db.scalar(select(Estacionamento).limit(1))
+        if first_est:
+            return first_est.id
+
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Header X-Tenant-ID é obrigatório para operações de escopo de estacionamento como SAAS_ADMIN.",

@@ -24,6 +24,7 @@ export class AuthService {
         localStorage.setItem(this.USER_KEY, JSON.stringify(res));
         this.currentUser.set(res);
         if (res.estacionamento_id) {
+          localStorage.setItem(this.TENANT_OVERRIDE_KEY, res.estacionamento_id);
           this.selectedTenantId.set(res.estacionamento_id);
         }
       })

@@ -223,3 +223,4 @@ def seed_data() -> None:
 
 if __name__ == "__main__":
     seed_data()
+

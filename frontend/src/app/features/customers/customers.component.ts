@@ -503,8 +503,13 @@ export class CustomersComponent implements OnInit {
 
   loadCustomers(): void {
     this.api.getCustomers().subscribe({
-      next: (res) => (this.customers = res),
-      error: () => {},
+      next: (res) => {
+        this.customers = res;
+        this.errorMessage = '';
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.detail || 'Erro ao carregar clientes do servidor.';
+      },
     });
   }
 
