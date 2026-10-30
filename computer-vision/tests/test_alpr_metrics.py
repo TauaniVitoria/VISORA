@@ -34,3 +34,4 @@ def test_alpr_evaluation_metrics():
     assert metrics.precision > 0.5
     assert metrics.recall > 0.5
     assert metrics.character_accuracy > 0.8
+

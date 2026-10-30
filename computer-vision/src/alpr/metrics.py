@@ -135,3 +135,4 @@ class ALPRMetricsCalculator:
             duplicate_count=duplicate_count,
             unrecognized_plates_count=unrecognized,
         )
+

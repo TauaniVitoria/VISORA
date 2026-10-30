@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # 1. PostgreSQL Database with Healthcheck
   db:
     image: postgres:16-alpine
     container_name: parkingsaas_db
@@ -18,21 +19,55 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - parkingsaas_network
 
+  # 2. FastAPI Backend & ALPR Computer Vision Engine
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
     container_name: parkingsaas_backend
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - .env
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DEBUG=${DEBUG:-False}
+      - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-parkingsaas_db}
+      - SECRET_KEY=${SECRET_KEY:-change-this-to-a-super-secret-key-in-production-min-32-chars}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:4200}
+      - CV_DEVICE=${CV_DEVICE:-cpu}
     ports:
       - "8000:8000"
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - alpr_data:/app/computer-vision/data
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    networks:
+      - parkingsaas_network
+
+  # 3. Angular 17 SPA Frontend with Nginx reverse proxy
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: parkingsaas_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+    networks:
+      - parkingsaas_network
 
 volumes:
   postgres_data:
+  alpr_data:
+
+networks:
+  parkingsaas_network:
+    driver: bridge
