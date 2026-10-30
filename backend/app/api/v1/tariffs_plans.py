@@ -114,10 +114,17 @@ def create_subscription(
 
     # Vincula os veículos à assinatura
     for v_id in sub_in.veiculos_ids:
-        # Valida que o veículo existe e pertence ao cliente
-        v_stmt = select(Veiculo).where(Veiculo.id == v_id, Veiculo.estacionamento_id == tenant_id)
+        # Valida que o veículo existe, está ativo e pertence ao cliente da assinatura no mesmo estacionamento
+        v_stmt = select(Veiculo).where(
+            Veiculo.id == v_id,
+            Veiculo.estacionamento_id == tenant_id,
+            Veiculo.cliente_id == sub_in.cliente_id,
+        )
         if not db.scalar(v_stmt):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Veículo {v_id} inválido.")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Veículo {v_id} inválido ou não pertence ao cliente informado.",
+            )
         av = AssinaturaVeiculo(assinatura_id=assinatura.id, veiculo_id=v_id)
         db.add(av)
 

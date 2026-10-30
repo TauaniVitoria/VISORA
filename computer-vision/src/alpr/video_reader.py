@@ -1,11 +1,11 @@
 """
-Módulo de leitura e decodificação de vídeos locais com OpenCV.
-Valida arquivos, extrai metadados e itera sobre quadros com registro de timestamps.
+Módulo de leitura e decodificação de vídeos locais e streams de rede (RTSP/HTTP/IP).
+Valida arquivos ou URLs de streaming, extrai metadados e itera sobre quadros com registro de timestamps.
 """
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator, Optional, Tuple
+from typing import Generator, Optional, Tuple, Union
 import cv2
 import numpy as np
 
@@ -27,13 +27,14 @@ class VideoCorruptedError(VideoReaderError):
 
 @dataclass(frozen=True)
 class VideoMetadata:
-    """Metadados estruturados do arquivo de vídeo."""
+    """Metadados estruturados do arquivo de vídeo ou stream."""
     file_path: str
     width: int
     height: int
     fps: float
     total_frames: int
     duration_seconds: float
+    is_stream: bool = False
 
 
 @dataclass
@@ -47,48 +48,64 @@ class VideoFrame:
 
 class VideoReader:
     """
-    Leitor sequencial de vídeos locais baseado em OpenCV VideoCapture.
+    Leitor sequencial de vídeos locais ou streams de câmeras IP (RTSP/HTTP).
+    Baseado em OpenCV VideoCapture.
     
     Suporta gerenciamento de contexto (with), validação estrita de integridade
     e cálculo de timestamps por frame.
     """
 
-    def __init__(self, video_path: str | Path):
-        self.video_path = Path(video_path).resolve()
+    def __init__(self, source: Union[str, Path]):
+        self.source_str = str(source).strip()
+        self.is_stream = self._is_stream_url(self.source_str)
+        self.video_path = Path(source).resolve() if not self.is_stream else None
         self._cap: Optional[cv2.VideoCapture] = None
         self._metadata: Optional[VideoMetadata] = None
         self._validate_and_open()
 
-    def _validate_and_open(self) -> None:
-        """Valida a existência do arquivo e inicializa o VideoCapture."""
-        if not self.video_path.exists():
-            raise VideoFileNotFoundError(f"Arquivo de vídeo não encontrado: {self.video_path}")
-        
-        if not self.video_path.is_file() or self.video_path.stat().st_size == 0:
-            raise VideoCorruptedError(f"Arquivo de vídeo inválido ou vazio: {self.video_path}")
+    @staticmethod
+    def _is_stream_url(url: str) -> bool:
+        """Verifica se a origem representa um protocolo de streaming de rede ou câmera IP."""
+        lower = url.lower()
+        return lower.startswith(("rtsp://", "http://", "https://", "rtmp://"))
 
-        self._cap = cv2.VideoCapture(str(self.video_path))
-        if not self._cap.isOpened():
-            raise VideoCorruptedError(f"Não foi possível abrir o arquivo de vídeo: {self.video_path}")
+    def _validate_and_open(self) -> None:
+        """Valida a existência do arquivo ou acessibilidade do stream e inicializa o VideoCapture."""
+        if not self.is_stream:
+            assert self.video_path is not None
+            if not self.video_path.exists():
+                raise VideoFileNotFoundError(f"Arquivo de vídeo não encontrado: {self.video_path}")
+            
+            if not self.video_path.is_file() or self.video_path.stat().st_size == 0:
+                raise VideoCorruptedError(f"Arquivo de vídeo inválido ou vazio: {self.video_path}")
+
+            self._cap = cv2.VideoCapture(str(self.video_path))
+        else:
+            # Stream RTSP ou HTTP
+            self._cap = cv2.VideoCapture(self.source_str)
+
+        if self._cap is None or not self._cap.isOpened():
+            raise VideoCorruptedError(f"Não foi possível abrir a fonte de vídeo: {self.source_str}")
 
         width = int(self._cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(self._cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps = float(self._cap.get(cv2.CAP_PROP_FPS))
-        total_frames = int(self._cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        total_frames = int(self._cap.get(cv2.CAP_PROP_FRAME_COUNT)) if not self.is_stream else 0
 
-        # Tratar FPS inválido ou zerado (comum em arquivos corrompidos ou webm mal codificados)
+        # Tratar FPS inválido ou zerado (comum em streams ao vivo ou arquivos webm)
         if fps <= 0:
             fps = 30.0  # Fallback padrão seguro
 
-        duration = (total_frames / fps) if total_frames > 0 else 0.0
+        duration = (total_frames / fps) if (total_frames > 0 and not self.is_stream) else 0.0
 
         self._metadata = VideoMetadata(
-            file_path=str(self.video_path),
+            file_path=self.source_str,
             width=width,
             height=height,
             fps=fps,
             total_frames=total_frames,
             duration_seconds=duration,
+            is_stream=self.is_stream,
         )
 
     @property
@@ -112,7 +129,7 @@ class VideoReader:
         if self._cap is None or not self._cap.isOpened():
             raise VideoReaderError("Captura de vídeo fechada ou não inicializada.")
 
-        if start_frame > 0:
+        if start_frame > 0 and not self.is_stream:
             self._cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
 
         frame_idx = start_frame
@@ -158,4 +175,3 @@ class VideoReader:
 
     def __del__(self) -> None:
         self.release()
-

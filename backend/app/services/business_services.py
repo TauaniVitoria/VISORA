@@ -745,6 +745,15 @@ class DashboardService:
         pendentes_valor = sum((c.valor_liquido for c in cobrancas_pendentes), Decimal("0.00"))
         pendentes_qtd = len(cobrancas_pendentes)
 
+        # Movimentações mais recentes (últimas 10)
+        recentes_stmt = (
+            select(Movimentacao)
+            .where(Movimentacao.estacionamento_id == tenant_id)
+            .order_by(Movimentacao.entrada_em.desc())
+            .limit(10)
+        )
+        movimentacoes_recentes = list(db.scalars(recentes_stmt).all())
+
         return {
             "veiculos_estacionados_agora": veiculos_estacionados,
             "entradas_hoje": entradas_hoje,
@@ -755,6 +764,7 @@ class DashboardService:
             "receita_total_registrada": receita_total,
             "cobrancas_pendentes_valor": pendentes_valor,
             "cobrancas_pendentes_quantidade": pendentes_qtd,
+            "movimentacoes_recentes": movimentacoes_recentes,
         }
 
 

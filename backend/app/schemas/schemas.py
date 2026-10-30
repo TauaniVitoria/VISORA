@@ -300,6 +300,7 @@ class DashboardMetricsOut(BaseModel):
     receita_total_registrada: Decimal
     cobrancas_pendentes_valor: Decimal
     cobrancas_pendentes_quantidade: int
+    movimentacoes_recentes: List[MovimentacaoOut] = []
 
 
 # --- Auditoria ---

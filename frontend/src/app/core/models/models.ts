@@ -134,6 +134,7 @@ export interface DashboardMetrics {
   receita_total_registrada: number;
   cobrancas_pendentes_valor: number;
   cobrancas_pendentes_quantidade: number;
+  movimentacoes_recentes?: Movimentacao[];
 }
 
 export interface AuditoriaLog {

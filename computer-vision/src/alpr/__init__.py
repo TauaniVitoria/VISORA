@@ -13,6 +13,7 @@ from alpr.plate_validator import PlateValidator, PlatePattern, ValidationResult
 from alpr.tracker import VehicleTracker, Track, PlateObservation, ConfirmedPassageEvent
 from alpr.visualizer import Visualizer, VideoWriterOutput
 from alpr.pipeline import ALPRPipeline, PipelineMetrics, FrameDetectionRecord
+from alpr.metrics import ALPRMetricsCalculator, ALPREvaluationMetrics
 
 __version__ = "0.2.0"
 
@@ -42,4 +43,6 @@ __all__ = [
     "ALPRPipeline",
     "PipelineMetrics",
     "FrameDetectionRecord",
+    "ALPRMetricsCalculator",
+    "ALPREvaluationMetrics",
 ]

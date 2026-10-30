@@ -35,4 +35,7 @@ def test_dashboard_metrics(client: TestClient, tenant_a_token: str):
     assert metrics["entradas_hoje"] >= 2
     assert metrics["saidas_hoje"] >= 1
     assert float(metrics["receita_total_registrada"]) >= 15.0
+    assert "movimentacoes_recentes" in metrics
+    assert isinstance(metrics["movimentacoes_recentes"], list)
+    assert len(metrics["movimentacoes_recentes"]) >= 2
 
