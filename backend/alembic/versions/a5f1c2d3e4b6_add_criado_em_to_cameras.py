@@ -27,3 +27,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_column('cameras', 'criado_em')
+

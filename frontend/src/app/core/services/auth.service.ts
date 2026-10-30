@@ -46,6 +46,15 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  isCliente(): boolean {
+    return this.currentUser()?.perfil === 'CLIENTE';
+  }
+
+  /** Rota inicial conforme o perfil do usuário. */
+  homeRoute(): string {
+    return this.isCliente() ? '/portal' : '/dashboard';
+  }
+
   isSaaSAdmin(): boolean {
     return this.currentUser()?.perfil === 'SAAS_ADMIN';
   }

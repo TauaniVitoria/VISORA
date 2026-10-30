@@ -12,6 +12,7 @@ from app.api.v1.cameras import router as cameras_router
 from app.api.v1.customers import router as customers_router
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.movements import router as movements_router
+from app.api.v1.portal import router as portal_router
 from app.api.v1.tariffs_plans import router as tariffs_plans_router
 from app.api.v1.tenants import router as tenants_router
 
@@ -26,4 +27,4 @@ api_router.include_router(billing_router)
 api_router.include_router(dashboard_router)
 api_router.include_router(audit_router)
 api_router.include_router(alpr_router)
-
+api_router.include_router(portal_router)

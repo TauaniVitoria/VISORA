@@ -57,6 +57,7 @@ export interface Cliente {
   telefone?: string;
   email?: string;
   criado_em: string;
+  acesso_portal?: boolean;
   veiculos: Veiculo[];
 }
 
@@ -186,4 +187,45 @@ export interface ALPRProcessVideoResponse {
   passages: ALPRPassageEvent[];
 }
 
+// --- Portal do Cliente ---
+export interface PortalPerfil {
+  nome: string;
+  documento_mascarado: string;
+  tipo_documento: string;
+  telefone?: string;
+  email?: string;
+  estacionamento: string;
+  veiculos: Veiculo[];
+}
 
+export interface PortalMovimentacao {
+  id: string;
+  placa: string;
+  entrada_em: string;
+  saida_em?: string;
+  permanencia_minutos?: number;
+  em_andamento: boolean;
+  status: 'aberta' | 'concluida' | 'inconsistente' | 'cancelada';
+  tipo_cobranca?: string;
+  cobranca?: Cobranca;
+}
+
+export interface PortalAssinatura {
+  id: string;
+  plano_id: string;
+  plano_nome: string;
+  tipo_recorrencia: 'mensal' | 'anual';
+  data_inicio: string;
+  data_fim: string;
+  status: string;
+  valor_total: number;
+  placas: string[];
+}
+
+export interface PortalResumo {
+  veiculos_cadastrados: number;
+  veiculos_estacionados: PortalMovimentacao[];
+  assinaturas_ativas: number;
+  cobrancas_pendentes_quantidade: number;
+  cobrancas_pendentes_valor: number;
+}

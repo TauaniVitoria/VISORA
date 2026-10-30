@@ -160,6 +160,11 @@ class Cliente(Base):
     veiculos: Mapped[List["Veiculo"]] = relationship("Veiculo", back_populates="cliente", cascade="all, delete-orphan")
     assinaturas: Mapped[List["Assinatura"]] = relationship("Assinatura", back_populates="cliente")
 
+    @property
+    def acesso_portal(self) -> bool:
+        """Indica se o cliente possui login ativo no portal."""
+        return self.usuario is not None and self.usuario.ativo
+
 
 # 4. Veículo
 class Veiculo(Base):

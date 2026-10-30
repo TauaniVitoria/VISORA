@@ -7,12 +7,16 @@ import uuid
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_tenant_id, get_current_user, get_db
-from app.models.entities import Usuario
+from app.api.deps import get_current_tenant_id, get_current_user, get_db, require_roles
+from app.models.entities import Usuario, UsuarioPerfil
 from app.schemas.schemas import CameraCreate, CameraOut, CameraUpdate
 from app.services.business_services import CameraService
 
-router = APIRouter(prefix="/cameras", tags=["Câmeras ALPR"])
+router = APIRouter(
+    prefix="/cameras",
+    tags=["Câmeras ALPR"],
+    dependencies=[Depends(require_roles(UsuarioPerfil.ESTACIONAMENTO_ADMIN, UsuarioPerfil.SAAS_ADMIN))],
+)
 
 
 @router.get("/", response_model=List[CameraOut])

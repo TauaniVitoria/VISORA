@@ -10,8 +10,8 @@ import uuid
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db, get_tenant_id
-from app.models.entities import Usuario
+from app.api.deps import get_current_user, get_db, get_tenant_id, require_roles
+from app.models.entities import Usuario, UsuarioPerfil
 from app.schemas.schemas import (
     ALPRConfirmedPassageEventOut,
     ALPRProcessVideoResponse,
@@ -19,7 +19,11 @@ from app.schemas.schemas import (
 )
 from app.services.alpr_service import ALPRService
 
-router = APIRouter(prefix="/alpr", tags=["Processamento ALPR"])
+router = APIRouter(
+    prefix="/alpr",
+    tags=["Processamento ALPR"],
+    dependencies=[Depends(require_roles(UsuarioPerfil.ESTACIONAMENTO_ADMIN, UsuarioPerfil.SAAS_ADMIN))],
+)
 
 
 @router.post("/process-video", response_model=ALPRProcessVideoResponse)

@@ -3,6 +3,7 @@ Módulo de segurança, criptografia de senhas e emissão/validação de tokens J
 """
 
 from datetime import datetime, timedelta, timezone
+import hashlib
 from typing import Any, Dict, Optional, Union
 import bcrypt
 from jose import JWTError, jwt
@@ -62,4 +63,21 @@ def decode_access_token(token: str) -> Dict[str, Any]:
     Lança JWTError caso o token seja inválido ou expirado.
     """
     return jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+
+
+PASSWORD_RESET_PURPOSE = "password_reset"
+
+
+def password_fingerprint(senha_hash: str) -> str:
+    """Impressão digital do hash atual: invalida o token de reset após a troca da senha (uso único)."""
+    return hashlib.sha256(senha_hash.encode("utf-8")).hexdigest()[:32]
+
+
+def create_password_reset_token(user_id: Any, senha_hash: str) -> str:
+    """Token de curta duração, com finalidade própria, que não serve como token de acesso."""
+    return create_access_token(
+        subject=str(user_id),
+        claims={"purpose": PASSWORD_RESET_PURPOSE, "pwd": password_fingerprint(senha_hash)},
+        expires_delta=timedelta(minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES),
+    )
 

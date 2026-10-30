@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div class="login-container">
       <div class="login-card">
@@ -23,7 +23,7 @@ import { AuthService } from '../../../core/services/auth.service';
           </div>
 
           <div class="form-group">
-            <label for="email">E-mail corporativo</label>
+            <label for="email">E-mail</label>
             <input
               type="email"
               id="email"
@@ -54,16 +54,8 @@ import { AuthService } from '../../../core/services/auth.service';
           </button>
         </form>
 
-        <div class="demo-box">
-          <span class="demo-title">Contas de Demonstração Rápida:</span>
-          <div class="demo-buttons">
-            <button type="button" class="btn-demo" (click)="fillDemo('gerente@central.com', 'senha123456')">
-              🏢 Administrador Estacionamento
-            </button>
-            <button type="button" class="btn-demo" (click)="fillDemo('saas_admin@platform.com', 'admin123456')">
-              ⚡ Super Admin SaaS
-            </button>
-          </div>
+        <div class="forgot-link">
+          <a routerLink="/forgot-password">Esqueci minha senha</a>
         </div>
       </div>
     </div>
@@ -161,39 +153,13 @@ import { AuthService } from '../../../core/services/auth.service';
       font-size: 0.85rem;
       margin-bottom: 1.25rem;
     }
-    .demo-box {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #1f2937;
+    .forgot-link {
       text-align: center;
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
     }
-    .demo-title {
-      font-size: 0.75rem;
-      color: #6b7280;
-      display: block;
-      margin-bottom: 0.75rem;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-    .demo-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .btn-demo {
-      padding: 0.5rem;
-      background: #1f2937;
-      border: 1px solid #374151;
-      color: #93c5fd;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-demo:hover {
-      background: #283548;
-      border-color: #60a5fa;
-    }
+    .forgot-link a { color: #60a5fa; text-decoration: none; }
+    .forgot-link a:hover { text-decoration: underline; }
   `],
 })
 export class LoginComponent {
@@ -213,7 +179,7 @@ export class LoginComponent {
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
         this.loading = false;
-        this.router.navigate(['/dashboard']);
+        this.router.navigate([this.authService.homeRoute()]);
       },
       error: (err) => {
         this.loading = false;
@@ -222,10 +188,5 @@ export class LoginComponent {
     });
   }
 
-  fillDemo(email: string, pass: string): void {
-    this.email = email;
-    this.password = pass;
-    this.errorMessage = '';
-  }
 }
 

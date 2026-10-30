@@ -14,6 +14,17 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Parking SaaS ALPR"
     SECRET_KEY: str = "change-this-to-a-super-secret-key-in-production-min-32-chars"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day
+    PASSWORD_RESET_EXPIRE_MINUTES: int = 30
+
+    # URL pública do frontend (usada para montar o link de recuperação de senha)
+    FRONTEND_URL: str = "http://localhost:4200"
+
+    # SMTP (opcional). Sem SMTP_HOST, e-mails não são enviados.
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM: str = "no-reply@parkingsaas.local"
 
     # Database
     POSTGRES_SERVER: str = "localhost"

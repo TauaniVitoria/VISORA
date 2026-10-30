@@ -48,6 +48,20 @@ class PasswordRecoveryRequest(BaseModel):
     email: EmailStr
 
 
+class PasswordResetConfirm(BaseModel):
+    token: str = Field(..., min_length=20)
+    nova_senha: str = Field(..., min_length=8, max_length=128)
+
+
+class MessageOut(BaseModel):
+    detail: str
+
+
+class PortalAccessCreate(BaseModel):
+    email: EmailStr
+    senha: str = Field(..., min_length=8, max_length=128, description="Senha provisória do cliente")
+
+
 class UsuarioCreate(BaseModel):
     nome: str = Field(..., min_length=2, max_length=120)
     email: EmailStr
@@ -140,6 +154,7 @@ class ClienteOut(BaseModel):
     telefone: Optional[str] = None
     email: Optional[str] = None
     criado_em: datetime
+    acesso_portal: bool = False
     veiculos: List[VeiculoOut] = []
 
 
@@ -368,3 +383,47 @@ class ALPRSimulateDetectionRequest(BaseModel):
     timestamp: Optional[datetime] = None
 
 
+
+
+# --- Portal do Cliente ---
+class PortalPerfilOut(BaseModel):
+    nome: str
+    documento_mascarado: str
+    tipo_documento: str
+    telefone: Optional[str] = None
+    email: Optional[str] = None
+    estacionamento: str
+    veiculos: List[VeiculoOut] = []
+
+
+class PortalMovimentacaoOut(BaseModel):
+    """Visão do cliente sobre uma passagem. Não expõe observações internas nem câmeras."""
+    id: uuid.UUID
+    placa: str
+    entrada_em: datetime
+    saida_em: Optional[datetime] = None
+    permanencia_minutos: Optional[int] = None
+    em_andamento: bool = False
+    status: str
+    tipo_cobranca: Optional[str] = None
+    cobranca: Optional[CobrancaOut] = None
+
+
+class PortalAssinaturaOut(BaseModel):
+    id: uuid.UUID
+    plano_id: uuid.UUID
+    plano_nome: str
+    tipo_recorrencia: str
+    data_inicio: date
+    data_fim: date
+    status: str
+    valor_total: Decimal
+    placas: List[str] = []
+
+
+class PortalResumoOut(BaseModel):
+    veiculos_cadastrados: int
+    veiculos_estacionados: List[PortalMovimentacaoOut] = []
+    assinaturas_ativas: int
+    cobrancas_pendentes_quantidade: int
+    cobrancas_pendentes_valor: Decimal

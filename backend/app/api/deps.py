@@ -9,11 +9,11 @@ from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.database import get_db
 from app.core.security import decode_access_token
-from app.models.entities import Usuario, UsuarioPerfil
+from app.models.entities import Cliente, Usuario, UsuarioPerfil
 
 security_bearer = HTTPBearer(auto_error=True)
 
@@ -26,6 +26,13 @@ def get_current_user(
     token = credentials.credentials
     try:
         payload = decode_access_token(token)
+        # Tokens com finalidade específica (ex.: redefinição de senha) não autenticam sessões.
+        if payload.get("purpose"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciais de autenticação inválidas ou expiradas.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         user_id_str: Optional[str] = payload.get("sub")
         if not user_id_str:
             raise HTTPException(
@@ -101,5 +108,31 @@ def get_current_tenant_id(
 
 
 get_tenant_id = get_current_tenant_id
+
+
+def get_current_cliente(
+    current_user: Usuario = Depends(require_roles(UsuarioPerfil.CLIENTE)),
+    db: Session = Depends(get_db),
+) -> Cliente:
+    """
+    Resolve o cliente vinculado ao usuário do portal. O escopo é sempre derivado do
+    cadastro do usuário autenticado: nenhum identificador de cliente/tenant vem do request.
+    """
+    if not current_user.cliente_id or not current_user.estacionamento_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Usuário não vinculado a um cliente.",
+        )
+    cliente = db.scalar(
+        select(Cliente)
+        .options(selectinload(Cliente.veiculos))
+        .where(
+            Cliente.id == current_user.cliente_id,
+            Cliente.estacionamento_id == current_user.estacionamento_id,
+        )
+    )
+    if not cliente:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cliente não encontrado.")
+    return cliente
 
 

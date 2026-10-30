@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
+import { clienteGuard, staffGuard } from './core/guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { CustomersComponent } from './features/customers/customers.component';
@@ -8,6 +8,8 @@ import { MovementsComponent } from './features/movements/movements.component';
 import { BillingComponent } from './features/billing/billing.component';
 import { AuditComponent } from './features/audit/audit.component';
 import { AlprComponent } from './features/alpr/alpr.component';
+import { PortalComponent } from './features/portal/portal.component';
+import { PasswordRecoveryComponent } from './features/auth/password-recovery/password-recovery.component';
 
 export const routes: Routes = [
   {
@@ -15,39 +17,52 @@ export const routes: Routes = [
     component: LoginComponent,
   },
   {
+    path: 'forgot-password',
+    component: PasswordRecoveryComponent,
+  },
+  {
+    path: 'reset-password',
+    component: PasswordRecoveryComponent,
+  },
+  {
+    path: 'portal',
+    component: PortalComponent,
+    canActivate: [clienteGuard],
+  },
+  {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [authGuard],
+    canActivate: [staffGuard],
   },
   {
     path: 'alpr',
     component: AlprComponent,
-    canActivate: [authGuard],
+    canActivate: [staffGuard],
   },
   {
     path: 'customers',
     component: CustomersComponent,
-    canActivate: [authGuard],
+    canActivate: [staffGuard],
   },
   {
     path: 'tariffs-plans',
     component: TariffsPlansComponent,
-    canActivate: [authGuard],
+    canActivate: [staffGuard],
   },
   {
     path: 'history',
     component: MovementsComponent,
-    canActivate: [authGuard],
+    canActivate: [staffGuard],
   },
   {
     path: 'billing',
     component: BillingComponent,
-    canActivate: [authGuard],
+    canActivate: [staffGuard],
   },
   {
     path: 'audit',
     component: AuditComponent,
-    canActivate: [authGuard],
+    canActivate: [staffGuard],
   },
   {
     path: '',

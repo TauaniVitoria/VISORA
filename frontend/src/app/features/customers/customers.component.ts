@@ -74,6 +74,13 @@ import { Cliente } from '../../core/models/models';
                   <button class="btn-add-vehicle" (click)="openAddVehicleModal(c)">
                     + Veículo
                   </button>
+                  <button class="btn-add-vehicle" *ngIf="!c.acesso_portal" (click)="openAccessModal(c)">
+                    Criar acesso ao portal
+                  </button>
+                  <ng-container *ngIf="c.acesso_portal">
+                    <span class="vehicle-chip">Portal ativo</span>
+                    <button class="btn-add-vehicle" (click)="revokeAccess(c)">Revogar acesso</button>
+                  </ng-container>
                 </td>
               </tr>
             </tbody>
@@ -149,6 +156,37 @@ import { Cliente } from '../../core/models/models';
             <div class="modal-footer">
               <button type="button" class="btn-secondary" (click)="showCustomerModal = false">Cancelar</button>
               <button type="submit" class="btn-primary" [disabled]="!isCustomerValid()">Salvar Cliente e Veículo</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal: Acesso ao Portal do Cliente -->
+      <div class="modal-backdrop" *ngIf="showAccessModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Acesso ao portal: {{ accessCustomer?.nome }}</h3>
+            <button class="btn-close" (click)="showAccessModal = false">✕</button>
+          </div>
+          <form (ngSubmit)="saveAccess()">
+            <div class="modal-body">
+              <div class="form-group">
+                <label>E-mail de login *</label>
+                <input type="email" [(ngModel)]="accessForm.email" name="ac_email" required class="form-control" />
+              </div>
+              <div class="form-group">
+                <label>Senha provisória * (mín. 8 caracteres)</label>
+                <input type="password" [(ngModel)]="accessForm.senha" name="ac_senha" required minlength="8"
+                       autocomplete="new-password" class="form-control" />
+                <small class="text-muted">Informe a senha ao cliente por um canal seguro. Ele poderá trocá-la em "Esqueci minha senha".</small>
+              </div>
+              <div class="text-muted" *ngIf="accessError">{{ accessError }}</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn-secondary" (click)="showAccessModal = false">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="!accessForm.email || accessForm.senha.length < 8">
+                Criar acesso
+              </button>
             </div>
           </form>
         </div>
@@ -424,8 +462,43 @@ export class CustomersComponent implements OnInit {
     tipo: 'carro',
   };
 
+  showAccessModal = false;
+  accessCustomer: Cliente | null = null;
+  accessForm = { email: '', senha: '' };
+  accessError = '';
+
   ngOnInit(): void {
     this.loadCustomers();
+  }
+
+  openAccessModal(customer: Cliente): void {
+    this.accessCustomer = customer;
+    this.accessForm = { email: customer.email ?? '', senha: '' };
+    this.accessError = '';
+    this.showAccessModal = true;
+  }
+
+  saveAccess(): void {
+    if (!this.accessCustomer) return;
+    this.api.createPortalAccess(this.accessCustomer.id, this.accessForm).subscribe({
+      next: () => {
+        this.showAccessModal = false;
+        this.accessForm = { email: '', senha: '' };
+        this.loadCustomers();
+      },
+      error: (err) => {
+        const detail = err.error?.detail;
+        this.accessError = typeof detail === 'string' ? detail : 'Não foi possível criar o acesso.';
+      },
+    });
+  }
+
+  revokeAccess(customer: Cliente): void {
+    if (!confirm(`Revogar o acesso de ${customer.nome} ao portal?`)) return;
+    this.api.revokePortalAccess(customer.id).subscribe({
+      next: () => this.loadCustomers(),
+      error: () => {},
+    });
   }
 
   loadCustomers(): void {

@@ -13,6 +13,10 @@ import {
   Movimentacao,
   Pagamento,
   Plano,
+  PortalAssinatura,
+  PortalMovimentacao,
+  PortalPerfil,
+  PortalResumo,
   Tarifa,
   Veiculo,
 } from '../models/models';
@@ -215,5 +219,57 @@ export class ApiService {
     if (opts?.max_frames !== undefined) formData.append('max_frames', opts.max_frames.toString());
     return this.http.post<ALPRProcessVideoResponse>(`${this.baseUrl}/alpr/process-video`, formData);
   }
-}
 
+  // --- Acesso ao portal (administrador) ---
+  createPortalAccess(clientId: string, data: { email: string; senha: string }): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/customers/${clientId}/portal-access`, data);
+  }
+
+  revokePortalAccess(clientId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/customers/${clientId}/portal-access`);
+  }
+
+  // --- Recuperação de senha (público) ---
+  forgotPassword(email: string): Observable<{ detail: string }> {
+    return this.http.post<{ detail: string }>(`${this.baseUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, novaSenha: string): Observable<{ detail: string }> {
+    return this.http.post<{ detail: string }>(`${this.baseUrl}/auth/reset-password`, {
+      token,
+      nova_senha: novaSenha,
+    });
+  }
+
+  // --- Portal do Cliente ---
+  getPortalProfile(): Observable<PortalPerfil> {
+    return this.http.get<PortalPerfil>(`${this.baseUrl}/portal/me`);
+  }
+
+  getPortalSummary(): Observable<PortalResumo> {
+    return this.http.get<PortalResumo>(`${this.baseUrl}/portal/summary`);
+  }
+
+  getPortalMovements(skip = 0, limit = 50): Observable<PortalMovimentacao[]> {
+    const params = new HttpParams().set('skip', skip).set('limit', limit);
+    return this.http.get<PortalMovimentacao[]>(`${this.baseUrl}/portal/movements`, { params });
+  }
+
+  getPortalSubscriptions(): Observable<PortalAssinatura[]> {
+    return this.http.get<PortalAssinatura[]>(`${this.baseUrl}/portal/subscriptions`);
+  }
+
+  getPortalPlans(): Observable<Plano[]> {
+    return this.http.get<Plano[]>(`${this.baseUrl}/portal/plans`);
+  }
+
+  getPortalCharges(statusFilter?: string): Observable<Cobranca[]> {
+    let params = new HttpParams();
+    if (statusFilter) params = params.set('status_filter', statusFilter);
+    return this.http.get<Cobranca[]>(`${this.baseUrl}/portal/charges`, { params });
+  }
+
+  getPortalPayments(): Observable<Pagamento[]> {
+    return this.http.get<Pagamento[]>(`${this.baseUrl}/portal/payments`);
+  }
+}

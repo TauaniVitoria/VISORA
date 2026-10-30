@@ -12,7 +12,17 @@ from fastapi import HTTPException, status
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 
-from app.core.security import get_password_hash, verify_password
+from jose import JWTError
+
+from app.core.security import (
+    PASSWORD_RESET_PURPOSE,
+    create_password_reset_token,
+    decode_access_token,
+    get_password_hash,
+    password_fingerprint,
+    verify_password,
+)
+from app.services.notification_service import send_password_reset_email
 from app.models.entities import (
     Assinatura,
     AssinaturaStatus,
@@ -81,16 +91,19 @@ class AuthService:
         return user
 
     @staticmethod
-    def create_user(db: Session, user_in: UsuarioCreate) -> Usuario:
-        # Verifica se email já existe
-        stmt = select(Usuario).where(Usuario.email == user_in.email.lower().strip())
-        if db.scalar(stmt):
+    def create_user(
+        db: Session,
+        user_in: UsuarioCreate,
+        cliente_id: Optional[uuid.UUID] = None,
+    ) -> Usuario:
+        """Criação de baixo nível. A política de quem pode criar o quê fica em `register_user`."""
+        email = user_in.email.lower().strip()
+        if db.scalar(select(Usuario).where(Usuario.email == email)):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email já cadastrado na plataforma.",
             )
 
-        # Se for admin de estacionamento, o estacionamento_id é obrigatório
         if user_in.perfil in [UsuarioPerfil.ESTACIONAMENTO_ADMIN, UsuarioPerfil.CLIENTE]:
             if not user_in.estacionamento_id:
                 raise HTTPException(
@@ -100,16 +113,99 @@ class AuthService:
 
         new_user = Usuario(
             nome=user_in.nome,
-            email=user_in.email.lower().strip(),
+            email=email,
             senha_hash=get_password_hash(user_in.senha),
             perfil=user_in.perfil.value if isinstance(user_in.perfil, UsuarioPerfil) else user_in.perfil,
             estacionamento_id=user_in.estacionamento_id,
+            cliente_id=cliente_id,
             ativo=True,
         )
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
         return new_user
+
+    @staticmethod
+    def register_user(db: Session, actor: Usuario, user_in: UsuarioCreate) -> Usuario:
+        """
+        Cadastro de usuários administrativos por um usuário autenticado:
+        - SAAS_ADMIN cria SAAS_ADMIN ou ESTACIONAMENTO_ADMIN (de qualquer estacionamento existente).
+        - ESTACIONAMENTO_ADMIN cria apenas ESTACIONAMENTO_ADMIN, sempre no próprio estacionamento.
+        - Usuários CLIENTE só nascem via acesso ao portal (vinculados a um cliente).
+        """
+        if user_in.perfil == UsuarioPerfil.CLIENTE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Acesso de cliente deve ser criado pelo cadastro do cliente (acesso ao portal).",
+            )
+
+        if actor.perfil == UsuarioPerfil.ESTACIONAMENTO_ADMIN.value:
+            if user_in.perfil != UsuarioPerfil.ESTACIONAMENTO_ADMIN:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Perfil não permitido.")
+            if user_in.estacionamento_id not in (None, actor.estacionamento_id):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Não é permitido criar usuários em outro estacionamento.",
+                )
+            user_in = user_in.model_copy(update={"estacionamento_id": actor.estacionamento_id})
+        elif actor.perfil != UsuarioPerfil.SAAS_ADMIN.value:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acesso não autorizado.")
+
+        if user_in.estacionamento_id and not db.get(Estacionamento, user_in.estacionamento_id):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Estacionamento não encontrado.")
+
+        user = AuthService.create_user(db, user_in)
+        AuditService.log(
+            db,
+            acao="CRIACAO_USUARIO",
+            tabela="usuarios",
+            registro_id=str(user.id),
+            tenant_id=user.estacionamento_id,
+            usuario_id=actor.id,
+            dados_novos={"email": user.email, "perfil": user.perfil},
+        )
+        return user
+
+    @staticmethod
+    def request_password_reset(db: Session, email: str) -> None:
+        """
+        Gera e envia o token de redefinição. Não revela se o e-mail existe:
+        quem chama deve responder sempre com a mesma mensagem.
+        """
+        user = db.scalar(select(Usuario).where(Usuario.email == email.lower().strip()))
+        if not user or not user.ativo:
+            return
+        token = create_password_reset_token(user.id, user.senha_hash)
+        send_password_reset_email(user.email, token)
+
+    @staticmethod
+    def reset_password(db: Session, token: str, nova_senha: str) -> None:
+        """Valida o token (finalidade, expiração, uso único) e troca a senha."""
+        invalid = HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token inválido ou expirado.",
+        )
+        try:
+            payload = decode_access_token(token)
+            if payload.get("purpose") != PASSWORD_RESET_PURPOSE:
+                raise invalid
+            user = db.get(Usuario, uuid.UUID(payload["sub"]))
+        except (JWTError, ValueError, KeyError):
+            raise invalid
+
+        if not user or not user.ativo or payload.get("pwd") != password_fingerprint(user.senha_hash):
+            raise invalid
+
+        user.senha_hash = get_password_hash(nova_senha)
+        db.commit()
+        AuditService.log(
+            db,
+            acao="REDEFINICAO_SENHA",
+            tabela="usuarios",
+            registro_id=str(user.id),
+            tenant_id=user.estacionamento_id,
+            usuario_id=user.id,
+        )
 
 
 class TenantService:

@@ -9,7 +9,15 @@ import { AuthService } from '../../core/services/auth.service';
   imports: [CommonModule, RouterModule],
   template: `
     <aside class="app-sidebar">
-      <div class="sidebar-menu">
+      <div class="sidebar-menu" *ngIf="authService.isCliente()">
+        <div class="menu-label">MEU PORTAL</div>
+        <a routerLink="/portal" routerLinkActive="active" class="menu-item">
+          <span class="menu-icon">🏠</span>
+          <span>Minha Conta</span>
+        </a>
+      </div>
+
+      <div class="sidebar-menu" *ngIf="!authService.isCliente()">
         <div class="menu-label">OPERAÇÃO</div>
         <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
           <span class="menu-icon">📊</span>
@@ -45,7 +53,7 @@ import { AuthService } from '../../core/services/auth.service';
         </a>
       </div>
 
-      <div class="sidebar-footer">
+      <div class="sidebar-footer" *ngIf="!authService.isCliente()">
         <div class="status-indicator">
           <span class="status-dot"></span>
           <span>ALPR Engine Online</span>
