@@ -99,3 +99,4 @@ pytest -v
 - **Acompanhar logs do backend:** `docker compose logs -f backend`
 - **Parar todos os contêineres:** `docker compose down`
 - **Parar e limpar volumes persistentes:** `docker compose down -v`
+
