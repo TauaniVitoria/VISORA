@@ -64,7 +64,7 @@ docker compose exec backend python scripts/create_saas_admin.py --email admin@pa
 
 Acesse:
 - **Aplicação Web:** [http://localhost:4200](http://localhost:4200)
-- **API Swagger:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **API Swagger:** [http://localhost:8000/api/v1/docs](http://localhost:8000/api/v1/docs)
 
 ---
 

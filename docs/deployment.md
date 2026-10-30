@@ -35,8 +35,8 @@ docker compose ps
 
 ### URLs de Acesso dos Serviços:
 - **Frontend SPA (Portal do Cliente & Painel Administrativo):** [http://localhost:4200](http://localhost:4200)
-- **Documentação Interativa da API (Swagger UI):** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **OpenAPI Schema (JSON):** [http://localhost:8000/openapi.json](http://localhost:8000/openapi.json)
+- **Documentação Interativa da API (Swagger UI):** [http://localhost:8000/api/v1/docs](http://localhost:8000/api/v1/docs)
+- **OpenAPI Schema (JSON):** [http://localhost:8000/api/v1/openapi.json](http://localhost:8000/api/v1/openapi.json)
 - **PostgreSQL Database:** `localhost:5432`
 
 ---
