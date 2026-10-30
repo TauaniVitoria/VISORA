@@ -24,10 +24,11 @@ from app.services.business_services import AuthService  # noqa: E402
 def main() -> None:
     parser = argparse.ArgumentParser(description="Cria o primeiro SAAS_ADMIN.")
     parser.add_argument("--email", required=True)
+    parser.add_argument("--password", help="Senha do usuário (opcional, pode ser informada via SAAS_ADMIN_PASSWORD ou prompt).")
     parser.add_argument("--nome", default="Administrador SaaS")
     args = parser.parse_args()
 
-    senha = os.environ.get("SAAS_ADMIN_PASSWORD") or getpass.getpass("Senha (mín. 8 caracteres): ")
+    senha = args.password or os.environ.get("SAAS_ADMIN_PASSWORD") or getpass.getpass("Senha (mín. 8 caracteres): ")
     if len(senha) < 8:
         sys.exit("A senha deve ter pelo menos 8 caracteres.")
 

@@ -2,7 +2,7 @@
 Endpoints de tarifas avulsas, planos mensalistas/anualistas e assinaturas.
 """
 
-from datetime import date, timedelta
+from datetime import timedelta
 from decimal import Decimal
 from typing import Any, List
 import uuid
@@ -65,7 +65,7 @@ def list_plans(
     db: Session = Depends(get_db),
 ) -> Any:
     """Lista todos os planos ativos do estacionamento."""
-    stmt = select(Plano).where(Plano.estacionamento_id == tenant_id, Plano.ativo == True)
+    stmt = select(Plano).where(Plano.estacionamento_id == tenant_id, Plano.ativo.is_(True))
     return list(db.scalars(stmt).all())
 
 
