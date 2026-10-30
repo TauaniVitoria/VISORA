@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
+  ALPRPassageEvent,
+  ALPRProcessVideoResponse,
   AuditoriaLog,
+  Camera,
   Cliente,
   Cobranca,
   DashboardMetrics,
@@ -143,6 +146,74 @@ export class ApiService {
   // --- Auditoria ---
   getAuditLogs(): Observable<AuditoriaLog[]> {
     return this.http.get<AuditoriaLog[]>(`${this.baseUrl}/audit/`);
+  }
+
+  // --- Câmeras ALPR ---
+  getCameras(): Observable<Camera[]> {
+    return this.http.get<Camera[]>(`${this.baseUrl}/cameras/`);
+  }
+
+  createCamera(data: {
+    identificador: string;
+    tipo: string;
+    rtsp_url?: string;
+    localizacao?: string;
+    ativa?: boolean;
+  }): Observable<Camera> {
+    return this.http.post<Camera>(`${this.baseUrl}/cameras/`, data);
+  }
+
+  updateCamera(cameraId: string, data: {
+    identificador?: string;
+    tipo?: string;
+    rtsp_url?: string;
+    localizacao?: string;
+    ativa?: boolean;
+  }): Observable<Camera> {
+    return this.http.put<Camera>(`${this.baseUrl}/cameras/${cameraId}`, data);
+  }
+
+  deleteCamera(cameraId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/cameras/${cameraId}`);
+  }
+
+  // --- Processamento ALPR ---
+  alprSimulateDetection(data: {
+    placa: string;
+    camera_id?: string;
+    tipo_evento?: string;
+    ocr_confidence?: number;
+    det_confidence?: number;
+  }): Observable<ALPRPassageEvent> {
+    return this.http.post<ALPRPassageEvent>(`${this.baseUrl}/alpr/simulate-detection`, data);
+  }
+
+  alprProcessVideoByPath(data: {
+    video_path: string;
+    camera_id?: string;
+    sentido_default?: string;
+    max_frames?: number;
+    save_annotated_video?: boolean;
+  }): Observable<ALPRProcessVideoResponse> {
+    const formData = new FormData();
+    formData.append('video_path', data.video_path);
+    if (data.camera_id) formData.append('camera_id', data.camera_id);
+    if (data.sentido_default) formData.append('sentido_default', data.sentido_default);
+    if (data.max_frames !== undefined) formData.append('max_frames', data.max_frames.toString());
+    if (data.save_annotated_video !== undefined) formData.append('save_annotated_video', String(data.save_annotated_video));
+    return this.http.post<ALPRProcessVideoResponse>(`${this.baseUrl}/alpr/process-video`, formData);
+  }
+
+  alprProcessVideoUpload(
+    file: File,
+    opts?: { camera_id?: string; sentido_default?: string; max_frames?: number }
+  ): Observable<ALPRProcessVideoResponse> {
+    const formData = new FormData();
+    formData.append('video_file', file, file.name);
+    if (opts?.camera_id) formData.append('camera_id', opts.camera_id);
+    if (opts?.sentido_default) formData.append('sentido_default', opts.sentido_default);
+    if (opts?.max_frames !== undefined) formData.append('max_frames', opts.max_frames.toString());
+    return this.http.post<ALPRProcessVideoResponse>(`${this.baseUrl}/alpr/process-video`, formData);
   }
 }
 

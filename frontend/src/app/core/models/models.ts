@@ -148,3 +148,42 @@ export interface AuditoriaLog {
   criado_em: string;
 }
 
+export interface Camera {
+  id: string;
+  estacionamento_id: string;
+  identificador: string;
+  tipo: 'entrada' | 'saida' | 'ambos';
+  rtsp_url?: string;
+  localizacao?: string;
+  ativa: boolean;
+  criado_em: string;
+}
+
+export interface ALPRPassageEvent {
+  track_id: number;
+  plate: string;
+  pattern: string;
+  vehicle_class: string;
+  timestamp_sec: number;
+  ocr_confidence: number;
+  det_confidence: number;
+  tipo_evento: 'entrada' | 'saida' | 'inconsistente';
+  movement_id?: string;
+  status_movimentacao?: string;
+}
+
+export interface ALPRProcessVideoResponse {
+  video_source: string;
+  total_frames_processed: number;
+  processing_time_seconds: number;
+  average_fps: number;
+  vehicles_detected_count: number;
+  plates_detected_count: number;
+  valid_plates_count: number;
+  invalid_plates_count: number;
+  confirmed_passages_count: number;
+  movements_registered: number;
+  passages: ALPRPassageEvent[];
+}
+
+

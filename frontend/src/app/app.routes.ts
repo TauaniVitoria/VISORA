@@ -7,6 +7,7 @@ import { TariffsPlansComponent } from './features/tariffs-plans/tariffs-plans.co
 import { MovementsComponent } from './features/movements/movements.component';
 import { BillingComponent } from './features/billing/billing.component';
 import { AuditComponent } from './features/audit/audit.component';
+import { AlprComponent } from './features/alpr/alpr.component';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,11 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'alpr',
+    component: AlprComponent,
     canActivate: [authGuard],
   },
   {

@@ -15,6 +15,10 @@ import { AuthService } from '../../core/services/auth.service';
           <span class="menu-icon">📊</span>
           <span>Dashboard</span>
         </a>
+        <a routerLink="/alpr" routerLinkActive="active" class="menu-item">
+          <span class="menu-icon">📹</span>
+          <span>Central ALPR</span>
+        </a>
         <a routerLink="/history" routerLinkActive="active" class="menu-item">
           <span class="menu-icon">🎥</span>
           <span>Histórico ALPR</span>

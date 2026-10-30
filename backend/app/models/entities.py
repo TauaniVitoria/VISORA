@@ -248,6 +248,7 @@ class Camera(Base):
     rtsp_url: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     localizacao: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     ativa: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    criado_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     estacionamento: Mapped["Estacionamento"] = relationship("Estacionamento", back_populates="cameras")
 

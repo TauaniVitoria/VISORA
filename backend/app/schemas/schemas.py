@@ -301,3 +301,70 @@ class AuditoriaOut(BaseModel):
     ip_origem: Optional[str] = None
     criado_em: datetime
 
+
+# --- Câmeras ---
+class CameraCreate(BaseModel):
+    identificador: str = Field(..., min_length=2, max_length=50)
+    tipo: CameraTipo = CameraTipo.AMBOS
+    rtsp_url: Optional[str] = Field(None, max_length=255)
+    localizacao: Optional[str] = Field(None, max_length=100)
+    ativa: bool = True
+
+
+class CameraUpdate(BaseModel):
+    identificador: Optional[str] = Field(None, min_length=2, max_length=50)
+    tipo: Optional[CameraTipo] = None
+    rtsp_url: Optional[str] = Field(None, max_length=255)
+    localizacao: Optional[str] = Field(None, max_length=100)
+    ativa: Optional[bool] = None
+
+
+class CameraOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: uuid.UUID
+    estacionamento_id: uuid.UUID
+    identificador: str
+    tipo: str
+    rtsp_url: Optional[str] = None
+    localizacao: Optional[str] = None
+    ativa: bool
+    criado_em: datetime
+
+
+# --- Processamento ALPR & Pipeline ---
+class ALPRConfirmedPassageEventOut(BaseModel):
+    track_id: int
+    plate: str
+    pattern: str
+    vehicle_class: str
+    timestamp_sec: float
+    ocr_confidence: float
+    det_confidence: float
+    tipo_evento: str  # 'entrada' | 'saida' | 'inconsistente'
+    movement_id: Optional[uuid.UUID] = None
+    status_movimentacao: Optional[str] = None
+
+
+class ALPRProcessVideoResponse(BaseModel):
+    video_source: str
+    total_frames_processed: int
+    processing_time_seconds: float
+    average_fps: float
+    vehicles_detected_count: int
+    plates_detected_count: int
+    valid_plates_count: int
+    invalid_plates_count: int
+    confirmed_passages_count: int
+    movements_registered: int
+    passages: List[ALPRConfirmedPassageEventOut] = []
+
+
+class ALPRSimulateDetectionRequest(BaseModel):
+    placa: str = Field(..., min_length=7, max_length=10)
+    camera_id: Optional[uuid.UUID] = None
+    tipo_evento: Optional[str] = Field("auto", description="'entrada', 'saida' ou 'auto'")
+    ocr_confidence: float = Field(0.95, ge=0.0, le=1.0)
+    det_confidence: float = Field(0.90, ge=0.0, le=1.0)
+    timestamp: Optional[datetime] = None
+
+

@@ -99,3 +99,7 @@ def get_current_tenant_id(
 
     return current_user.estacionamento_id
 
+
+get_tenant_id = get_current_tenant_id
+
+

@@ -18,6 +18,8 @@ from app.models.entities import (
     AssinaturaStatus,
     AssinaturaVeiculo,
     Auditoria,
+    Camera,
+    CameraTipo,
     Cliente,
     Cobranca,
     CobrancaStatus,
@@ -37,6 +39,8 @@ from app.models.entities import (
     VeiculoTipo,
 )
 from app.schemas.schemas import (
+    CameraCreate,
+    CameraUpdate,
     ClienteCreate,
     EstacionamentoCreate,
     MovimentacaoCorrecaoManual,
@@ -656,4 +660,186 @@ class DashboardService:
             "cobrancas_pendentes_valor": pendentes_valor,
             "cobrancas_pendentes_quantidade": pendentes_qtd,
         }
+
+
+class AuditService:
+    """Utilitário centralizado para registro na trilha de auditoria."""
+
+    @staticmethod
+    def log(
+        db: Session,
+        acao: str,
+        tabela: str,
+        registro_id: str,
+        tenant_id: Optional[uuid.UUID] = None,
+        usuario_id: Optional[uuid.UUID] = None,
+        dados_anteriores: Optional[Dict[str, Any]] = None,
+        dados_novos: Optional[Dict[str, Any]] = None,
+        ip_origem: Optional[str] = None,
+    ) -> Auditoria:
+        audit = Auditoria(
+            estacionamento_id=tenant_id,
+            usuario_id=usuario_id,
+            acao=acao,
+            tabela=tabela,
+            registro_id=registro_id,
+            dados_anteriores=dados_anteriores,
+            dados_novos=dados_novos,
+            ip_origem=ip_origem,
+        )
+        db.add(audit)
+        db.commit()
+        db.refresh(audit)
+        return audit
+
+
+class CameraService:
+    """Gestão de Câmeras para leitura de placas e monitoramento de cancelas."""
+
+    @staticmethod
+    def create_camera(
+        db: Session,
+        tenant_id: uuid.UUID,
+        camera_in: CameraCreate,
+        usuario_id: Optional[uuid.UUID] = None,
+    ) -> Camera:
+        # Validação: identificador único por estacionamento
+        stmt = select(Camera).where(
+            Camera.estacionamento_id == tenant_id,
+            Camera.identificador == camera_in.identificador,
+        )
+        if db.scalar(stmt):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Já existe uma câmera com o identificador '{camera_in.identificador}' neste estacionamento.",
+            )
+
+        camera = Camera(
+            estacionamento_id=tenant_id,
+            identificador=camera_in.identificador,
+            tipo=camera_in.tipo.value if isinstance(camera_in.tipo, CameraTipo) else camera_in.tipo,
+            rtsp_url=camera_in.rtsp_url,
+            localizacao=camera_in.localizacao,
+            ativa=camera_in.ativa,
+        )
+        db.add(camera)
+        db.commit()
+        db.refresh(camera)
+
+        AuditService.log(
+            db,
+            acao="CRIACAO_CAMERA",
+            tabela="cameras",
+            registro_id=str(camera.id),
+            tenant_id=tenant_id,
+            usuario_id=usuario_id,
+            dados_novos={
+                "identificador": camera.identificador,
+                "tipo": camera.tipo,
+                "localizacao": camera.localizacao,
+            },
+        )
+        return camera
+
+    @staticmethod
+    def list_cameras(
+        db: Session,
+        tenant_id: uuid.UUID,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[Camera]:
+        stmt = (
+            select(Camera)
+            .where(Camera.estacionamento_id == tenant_id)
+            .order_by(Camera.identificador.asc())
+            .offset(skip)
+            .limit(limit)
+        )
+        return list(db.scalars(stmt).all())
+
+    @staticmethod
+    def get_camera(
+        db: Session,
+        tenant_id: uuid.UUID,
+        camera_id: uuid.UUID,
+    ) -> Camera:
+        stmt = select(Camera).where(
+            Camera.id == camera_id,
+            Camera.estacionamento_id == tenant_id,
+        )
+        cam = db.scalar(stmt)
+        if not cam:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Câmera não encontrada para este estacionamento.",
+            )
+        return cam
+
+    @staticmethod
+    def update_camera(
+        db: Session,
+        tenant_id: uuid.UUID,
+        camera_id: uuid.UUID,
+        camera_in: CameraUpdate,
+        usuario_id: Optional[uuid.UUID] = None,
+    ) -> Camera:
+        camera = CameraService.get_camera(db, tenant_id, camera_id)
+        antigos = {
+            "identificador": camera.identificador,
+            "tipo": camera.tipo,
+            "localizacao": camera.localizacao,
+            "ativa": camera.ativa,
+        }
+
+        if camera_in.identificador is not None:
+            camera.identificador = camera_in.identificador
+        if camera_in.tipo is not None:
+            camera.tipo = camera_in.tipo.value if isinstance(camera_in.tipo, CameraTipo) else camera_in.tipo
+        if camera_in.rtsp_url is not None:
+            camera.rtsp_url = camera_in.rtsp_url
+        if camera_in.localizacao is not None:
+            camera.localizacao = camera_in.localizacao
+        if camera_in.ativa is not None:
+            camera.ativa = camera_in.ativa
+
+        db.commit()
+        db.refresh(camera)
+
+        AuditService.log(
+            db,
+            acao="ATUALIZACAO_CAMERA",
+            tabela="cameras",
+            registro_id=str(camera.id),
+            tenant_id=tenant_id,
+            usuario_id=usuario_id,
+            dados_anteriores=antigos,
+            dados_novos={
+                "identificador": camera.identificador,
+                "tipo": camera.tipo,
+                "localizacao": camera.localizacao,
+                "ativa": camera.ativa,
+            },
+        )
+        return camera
+
+    @staticmethod
+    def delete_camera(
+        db: Session,
+        tenant_id: uuid.UUID,
+        camera_id: uuid.UUID,
+        usuario_id: Optional[uuid.UUID] = None,
+    ) -> None:
+        camera = CameraService.get_camera(db, tenant_id, camera_id)
+        db.delete(camera)
+        db.commit()
+
+        AuditService.log(
+            db,
+            acao="EXCLUSAO_CAMERA",
+            tabela="cameras",
+            registro_id=str(camera_id),
+            tenant_id=tenant_id,
+            usuario_id=usuario_id,
+        )
+
 
