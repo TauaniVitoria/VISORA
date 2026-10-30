@@ -50,3 +50,4 @@ def send_password_reset_email(to_email: str, token: str) -> None:
             smtp.send_message(msg)
     except Exception:
         logger.exception("Falha ao enviar e-mail de recuperação de senha.")
+

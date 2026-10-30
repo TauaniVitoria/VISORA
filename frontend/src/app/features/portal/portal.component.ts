@@ -319,3 +319,4 @@ export class PortalComponent implements OnInit {
     this.errorMessage = message;
   }
 }
+

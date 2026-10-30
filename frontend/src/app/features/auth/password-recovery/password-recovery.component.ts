@@ -133,3 +133,4 @@ export class PasswordRecoveryComponent implements OnInit {
     });
   }
 }
+
