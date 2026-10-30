@@ -12,7 +12,12 @@ import { AuthService } from '../../../core/services/auth.service';
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <div class="logo-circle">🚗</div>
+          <div class="logo-circle">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="4"></rect>
+              <path d="M9 17V7h4a3 3 0 0 1 0 6H9"></path>
+            </svg>
+          </div>
           <h1>Parking SaaS ALPR</h1>
           <p>Automação e Gestão de Estacionamentos</p>
         </div>
@@ -84,7 +89,13 @@ import { AuthService } from '../../../core/services/auth.service';
       margin-bottom: 2rem;
     }
     .logo-circle {
-      font-size: 2.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      background: #1f2937;
+      border-radius: 12px;
       margin-bottom: 0.75rem;
     }
     .login-header h1 {

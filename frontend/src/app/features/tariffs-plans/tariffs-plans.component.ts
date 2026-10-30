@@ -66,7 +66,7 @@ import { Plano, Tarifa } from '../../core/models/models';
           <div class="card-header">
             <h3>Planos Mensalistas e Anualistas</h3>
             <button class="btn-subtle" (click)="showNewPlanForm = !showNewPlanForm">
-              {{ showNewPlanForm ? '✕ Cancelar' : '+ Novo Plano' }}
+              {{ showNewPlanForm ? 'Cancelar' : '+ Novo Plano' }}
             </button>
           </div>
 

@@ -24,13 +24,13 @@ import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/m
       <!-- Tabs -->
       <div class="tab-bar">
         <button class="tab-btn" [class.active]="activeTab === 'cameras'" (click)="activeTab = 'cameras'">
-          📹 Câmeras
+          Câmeras
         </button>
         <button class="tab-btn" [class.active]="activeTab === 'detect'" (click)="activeTab = 'detect'">
-          🔍 Detecção em Tempo Real
+          Detecção em Tempo Real
         </button>
         <button class="tab-btn" [class.active]="activeTab === 'video'" (click)="activeTab = 'video'">
-          🎬 Processar Vídeo
+          Processar Vídeo
         </button>
       </div>
 
@@ -78,7 +78,7 @@ import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/m
         <div class="cards-grid">
           <div *ngFor="let cam of cameras" class="camera-card" [class.inactive]="!cam.ativa">
             <div class="cam-header">
-              <span class="cam-icon">{{ cam.tipo === 'entrada' ? '🟢' : cam.tipo === 'saida' ? '🔴' : '🔵' }}</span>
+              <span class="cam-type-pill" [ngClass]="cam.tipo">{{ cam.tipo | uppercase }}</span>
               <span class="cam-id">{{ cam.identificador }}</span>
               <span class="cam-status" [class.online]="cam.ativa" [class.offline]="!cam.ativa">
                 {{ cam.ativa ? 'ATIVA' : 'INATIVA' }}
@@ -143,7 +143,7 @@ import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/m
           <div class="form-actions">
             <button class="btn-primary btn-detect" (click)="simulateDetection()"
                     [disabled]="!detectForm.placa || detectForm.placa.length < 7 || loading">
-              {{ loading ? 'Processando...' : '⚡ Executar Detecção ALPR' }}
+              {{ loading ? 'Processando...' : 'Executar Detecção ALPR' }}
             </button>
           </div>
         </div>
@@ -219,7 +219,7 @@ import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/m
           <div class="form-actions">
             <button class="btn-primary btn-process" (click)="processVideo()"
                     [disabled]="(!selectedVideoFile && !videoPathInput) || processingVideo">
-              {{ processingVideo ? 'Pipeline ALPR em execução...' : '🚀 Iniciar Processamento ALPR' }}
+              {{ processingVideo ? 'Pipeline ALPR em execução...' : 'Iniciar Processamento ALPR' }}
             </button>
           </div>
         </div>
@@ -355,7 +355,12 @@ import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/m
       &.inactive { opacity: 0.6; border-color: #f1f5f9; }
     }
     .cam-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
-    .cam-icon { font-size: 1.1rem; }
+    .cam-type-pill {
+      font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 4px; letter-spacing: 0.05em;
+      &.entrada { background: #dcfce7; color: #166534; }
+      &.saida { background: #fee2e2; color: #991b1b; }
+      &.ambos { background: #e0f2fe; color: #075985; }
+    }
     .cam-id { font-weight: 600; font-size: 0.95rem; color: #0f172a; flex: 1; }
     .cam-status {
       font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px;

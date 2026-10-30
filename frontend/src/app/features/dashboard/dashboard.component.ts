@@ -16,14 +16,19 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
           <p class="subtitle">Monitoramento em tempo real do pátio e inteligência ALPR</p>
         </div>
         <button class="btn-refresh" (click)="loadData()">
-          <span>🔄 Atualizar Dados</span>
+          <span>Atualizar Dados</span>
         </button>
       </div>
 
       <!-- KPI Cards Grid -->
       <div class="kpi-grid">
         <div class="kpi-card highlight">
-          <div class="kpi-icon">🚗</div>
+          <div class="kpi-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="4"></rect>
+              <path d="M9 17V7h4a3 3 0 0 1 0 6H9"></path>
+            </svg>
+          </div>
           <div class="kpi-data">
             <span class="kpi-label">Veículos Estacionados</span>
             <span class="kpi-value">{{ metrics?.veiculos_estacionados_agora ?? 0 }}</span>
@@ -31,7 +36,12 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-icon">🟢</div>
+          <div class="kpi-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
           <div class="kpi-data">
             <span class="kpi-label">Entradas Hoje</span>
             <span class="kpi-value text-green">{{ metrics?.entradas_hoje ?? 0 }}</span>
@@ -39,7 +49,12 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-icon">🔴</div>
+          <div class="kpi-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </div>
           <div class="kpi-data">
             <span class="kpi-label">Saídas Hoje</span>
             <span class="kpi-value text-blue">{{ metrics?.saidas_hoje ?? 0 }}</span>
@@ -47,7 +62,12 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-icon">💰</div>
+          <div class="kpi-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
           <div class="kpi-data">
             <span class="kpi-label">Receita Registrada</span>
             <span class="kpi-value text-emerald">R$ {{ (metrics?.receita_total_registrada ?? 0) | number:'1.2-2' }}</span>
@@ -55,7 +75,12 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-icon">⏳</div>
+          <div class="kpi-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
           <div class="kpi-data">
             <span class="kpi-label">Cobranças Pendentes</span>
             <span class="kpi-value text-amber">R$ {{ (metrics?.cobrancas_pendentes_valor ?? 0) | number:'1.2-2' }}</span>
@@ -65,7 +90,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
 
       <!-- Quick Actions for ALPR / Manual Simulation -->
       <div class="actions-card">
-        <h3>⚡ Ações Rápidas de Portaria e Reconhecimento ALPR</h3>
+        <h3>Ações Rápidas de Portaria e Reconhecimento ALPR</h3>
         <div class="actions-form">
           <div class="action-box">
             <label>Registrar Entrada (Veículo)</label>

@@ -10,7 +10,12 @@ import { AuthService } from '../../core/services/auth.service';
   template: `
     <header class="app-navbar">
       <div class="brand">
-        <span class="logo-icon">🚗</span>
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="4"></rect>
+            <path d="M9 17V7h4a3 3 0 0 1 0 6H9"></path>
+          </svg>
+        </div>
         <div class="brand-text">
           <span class="brand-title">Parking SaaS</span>
           <span class="brand-subtitle">ALPR Intelligent Platform</span>
@@ -53,9 +58,11 @@ import { AuthService } from '../../core/services/auth.service';
       gap: 0.75rem;
     }
     .logo-icon {
-      font-size: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: #1f2937;
-      padding: 0.25rem 0.5rem;
+      padding: 0.35rem;
       border-radius: 8px;
     }
     .brand-title {

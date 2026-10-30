@@ -106,13 +106,13 @@ import { Movimentacao } from '../../core/models/models';
         <div class="modal-content">
           <div class="modal-header">
             <h3>Correção Manual com Auditoria</h3>
-            <button class="btn-close" (click)="showCorrectionModal = false">✕</button>
+            <button class="btn-close" (click)="showCorrectionModal = false">&times;</button>
           </div>
 
           <form (ngSubmit)="saveCorrection()">
             <div class="modal-body">
               <p class="audit-warning">
-                ⚠️ Qualquer alteração manual nesta movimentação será permanentemente registrada na tabela de auditoria com seu usuário e IP.
+                Aviso: Qualquer alteração manual nesta movimentação será permanentemente registrada na tabela de auditoria com seu usuário e IP.
               </p>
 
               <div class="form-group">

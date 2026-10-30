@@ -66,7 +66,7 @@ import { Cliente } from '../../core/models/models';
                 <td>
                   <div class="vehicles-list">
                     <span class="vehicle-chip" *ngFor="let v of c.veiculos">
-                      🚗 {{ v.placa }} <small>({{ v.modelo || v.tipo }})</small>
+                      {{ v.placa }} <small>({{ v.modelo || v.tipo }})</small>
                     </span>
                   </div>
                 </td>
@@ -99,7 +99,7 @@ import { Cliente } from '../../core/models/models';
         <div class="modal-content">
           <div class="modal-header">
             <h3>Cadastrar Novo Cliente</h3>
-            <button class="btn-close" (click)="showCustomerModal = false">✕</button>
+            <button class="btn-close" (click)="showCustomerModal = false">&times;</button>
           </div>
 
           <form (ngSubmit)="saveCustomer()">
@@ -166,7 +166,7 @@ import { Cliente } from '../../core/models/models';
         <div class="modal-content">
           <div class="modal-header">
             <h3>Acesso ao portal: {{ accessCustomer?.nome }}</h3>
-            <button class="btn-close" (click)="showAccessModal = false">✕</button>
+            <button class="btn-close" (click)="showAccessModal = false">&times;</button>
           </div>
           <form (ngSubmit)="saveAccess()">
             <div class="modal-body">
@@ -197,7 +197,7 @@ import { Cliente } from '../../core/models/models';
         <div class="modal-content">
           <div class="modal-header">
             <h3>Adicionar Veículo para {{ selectedCustomer?.nome }}</h3>
-            <button class="btn-close" (click)="showVehicleModal = false">✕</button>
+            <button class="btn-close" (click)="showVehicleModal = false">&times;</button>
           </div>
 
           <form (ngSubmit)="saveAdditionalVehicle()">
