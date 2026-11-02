@@ -51,3 +51,4 @@ def downgrade() -> None:
         batch_op.drop_index('ix_clientes_codigo')
         batch_op.drop_column('codigo')
         batch_op.drop_column('plano_tipo')
+
