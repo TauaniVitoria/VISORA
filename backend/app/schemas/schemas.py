@@ -328,6 +328,7 @@ class MovimentacaoOut(BaseModel):
     tipo_cobranca: Optional[str] = None
     observacao: Optional[str] = None
     cobranca: Optional[CobrancaOut] = None
+    tem_plano: bool = False
 
 
 # --- Pagamento ---

@@ -74,25 +74,6 @@ import { AuthService } from '../../core/services/auth.service';
           </span>
           <span>Tarifas e Planos</span>
         </a>
-
-        <div class="menu-label">FINANCEIRO & GOVERNANÇA</div>
-        <a routerLink="/billing" routerLinkActive="active" class="menu-item">
-          <span class="menu-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-              <line x1="1" y1="10" x2="23" y2="10"></line>
-            </svg>
-          </span>
-          <span>Cobranças e Pagamentos</span>
-        </a>
-        <a routerLink="/audit" routerLinkActive="active" class="menu-item">
-          <span class="menu-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-          </span>
-          <span>Auditoria</span>
-        </a>
       </div>
 
       <div class="sidebar-footer" *ngIf="!authService.isCliente()">

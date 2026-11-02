@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.api.deps import get_current_tenant_id, get_current_user, get_db, require_roles
-from app.models.entities import Movimentacao, MovimentacaoStatus, Usuario, UsuarioPerfil
+from app.models.entities import Movimentacao, MovimentacaoStatus, Usuario, UsuarioPerfil, Veiculo
 from app.schemas.schemas import (
     MovimentacaoCorrecaoManual,
     MovimentacaoEntrada,
@@ -71,7 +71,10 @@ def list_active_vehicles(
     """Lista todos os veículos atualmente estacionados (permanência aberta)."""
     stmt = (
         select(Movimentacao)
-        .options(selectinload(Movimentacao.cobranca))
+        .options(
+            selectinload(Movimentacao.cobranca),
+            selectinload(Movimentacao.veiculo).selectinload(Veiculo.cliente),
+        )
         .where(
             Movimentacao.estacionamento_id == tenant_id,
             Movimentacao.status == MovimentacaoStatus.ABERTA.value,
@@ -101,7 +104,10 @@ def list_movement_history(
     """
     stmt = (
         select(Movimentacao)
-        .options(selectinload(Movimentacao.cobranca))
+        .options(
+            selectinload(Movimentacao.cobranca),
+            selectinload(Movimentacao.veiculo).selectinload(Veiculo.cliente),
+        )
         .where(Movimentacao.estacionamento_id == tenant_id)
     )
 

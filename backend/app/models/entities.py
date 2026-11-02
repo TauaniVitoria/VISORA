@@ -297,6 +297,14 @@ class Movimentacao(Base):
     veiculo: Mapped[Optional["Veiculo"]] = relationship("Veiculo")
     cobranca: Mapped[Optional["Cobranca"]] = relationship("Cobranca", back_populates="movimentacao", uselist=False)
 
+    @property
+    def tem_plano(self) -> bool:
+        if self.tipo_cobranca in (TipoCobranca.PLANO.value, "plano", "mensalista"):
+            return True
+        if self.veiculo and getattr(self.veiculo, "cliente", None) and getattr(self.veiculo.cliente, "plano_tipo", None):
+            return True
+        return False
+
 
 # 11. Cobrança
 class Cobranca(Base):

@@ -2,10 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
-import { Cliente, ClienteMovimentacao, Veiculo } from '../../core/models/models';
+import { Cliente, ClienteMovimentacao } from '../../core/models/models';
 
-type SortColumn = 'codigo' | 'nome' | 'telefone' | 'plano_tipo' | 'veiculos';
+type SortColumn = 'nome' | 'telefone' | 'plano_tipo' | 'veiculos';
 type SortDirection = 'asc' | 'desc';
+type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hora_saida' | 'permanencia' | 'valor' | 'status';
 
 @Component({
   selector: 'app-customers',
@@ -28,7 +29,7 @@ type SortDirection = 'asc' | 'desc';
         <input
           type="text"
           [(ngModel)]="searchQuery"
-          placeholder="Buscar por código, nome, telefone, plano ou placa..."
+          placeholder="Buscar por nome, telefone, plano ou placa..."
           class="search-input"
         />
       </div>
@@ -47,12 +48,6 @@ type SortDirection = 'asc' | 'desc';
           <table class="data-table">
             <thead>
               <tr>
-                <th (click)="setSort('codigo')" class="sortable-th">
-                  Código
-                  <span class="sort-indicator" *ngIf="sortColumn === 'codigo'">
-                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                  </span>
-                </th>
                 <th (click)="setSort('nome')" class="sortable-th">
                   Nome
                   <span class="sort-indicator" *ngIf="sortColumn === 'nome'">
@@ -83,9 +78,6 @@ type SortDirection = 'asc' | 'desc';
             </thead>
             <tbody>
               <tr *ngFor="let c of filteredCustomers">
-                <td>
-                  <span class="code-badge">{{ c.codigo || '—' }}</span>
-                </td>
                 <td>
                   <strong>{{ c.nome }}</strong>
                 </td>
@@ -143,10 +135,7 @@ type SortDirection = 'asc' | 'desc';
       <div class="modal-backdrop" *ngIf="showDetailsModal && selectedCustomerDetails">
         <div class="modal-content modal-large">
           <div class="modal-header">
-            <div>
-              <h3>Detalhes do Cliente</h3>
-              <p class="modal-subtitle">{{ selectedCustomerDetails.nome }} ({{ selectedCustomerDetails.codigo }})</p>
-            </div>
+            <h3>Detalhes do Cliente</h3>
             <button class="btn-close" (click)="closeCustomerDetails()">&times;</button>
           </div>
 
@@ -157,7 +146,7 @@ type SortDirection = 'asc' | 'desc';
               <div class="info-grid">
                 <div class="info-item">
                   <span class="info-label">Código Identificador</span>
-                  <span class="info-value"><strong>{{ selectedCustomerDetails.codigo }}</strong></span>
+                  <span class="info-value">{{ selectedCustomerDetails.codigo }}</span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">Nome Completo</span>
@@ -193,7 +182,7 @@ type SortDirection = 'asc' | 'desc';
                 </div>
               </div>
 
-              <!-- Veículos Vinculados Detalhados -->
+              <!-- Veículos Vinculados Detalhados (sem informação de cor) -->
               <div class="sub-section">
                 <span class="info-label">Veículos Vinculados</span>
                 <div class="vehicles-detailed-list" *ngIf="selectedCustomerDetails.veiculos.length > 0; else noVehiclesDetailed">
@@ -202,7 +191,6 @@ type SortDirection = 'asc' | 'desc';
                     <span class="vehicle-meta">
                       {{ v.tipo | uppercase }}
                       <span *ngIf="v.marca || v.modelo">• {{ v.marca }} {{ v.modelo }}</span>
-                      <span *ngIf="v.cor">• Cor: {{ v.cor }}</span>
                     </span>
                   </div>
                 </div>
@@ -243,27 +231,67 @@ type SortDirection = 'asc' | 'desc';
                 </div>
               </div>
 
-              <!-- Tabela de Movimentações -->
+              <!-- Tabela de Movimentações com Ordenação -->
               <div *ngIf="loadingMovements" class="loading-state">
                 <p>Carregando movimentações do cliente...</p>
               </div>
 
-              <div class="table-container movements-table-container" *ngIf="!loadingMovements && customerMovements.length > 0">
+              <div class="table-container movements-table-container" *ngIf="!loadingMovements && sortedCustomerMovements.length > 0">
                 <table class="data-table">
                   <thead>
                     <tr>
-                      <th>Placa</th>
-                      <th>Data Entrada</th>
-                      <th>Hora Entrada</th>
-                      <th>Data Saída</th>
-                      <th>Hora Saída</th>
-                      <th>Permanência</th>
-                      <th>Valor Calculado</th>
-                      <th>Status</th>
+                      <th (click)="setMovSort('placa')" class="sortable-th">
+                        Placa
+                        <span class="sort-indicator" *ngIf="movSortColumn === 'placa'">
+                          {{ movSortDirection === 'asc' ? '▲' : '▼' }}
+                        </span>
+                      </th>
+                      <th (click)="setMovSort('entrada_em')" class="sortable-th">
+                        Data Entrada
+                        <span class="sort-indicator" *ngIf="movSortColumn === 'entrada_em'">
+                          {{ movSortDirection === 'asc' ? '▲' : '▼' }}
+                        </span>
+                      </th>
+                      <th (click)="setMovSort('hora_entrada')" class="sortable-th">
+                        Hora Entrada
+                        <span class="sort-indicator" *ngIf="movSortColumn === 'hora_entrada'">
+                          {{ movSortDirection === 'asc' ? '▲' : '▼' }}
+                        </span>
+                      </th>
+                      <th (click)="setMovSort('saida_em')" class="sortable-th">
+                        Data Saída
+                        <span class="sort-indicator" *ngIf="movSortColumn === 'saida_em'">
+                          {{ movSortDirection === 'asc' ? '▲' : '▼' }}
+                        </span>
+                      </th>
+                      <th (click)="setMovSort('hora_saida')" class="sortable-th">
+                        Hora Saída
+                        <span class="sort-indicator" *ngIf="movSortColumn === 'hora_saida'">
+                          {{ movSortDirection === 'asc' ? '▲' : '▼' }}
+                        </span>
+                      </th>
+                      <th (click)="setMovSort('permanencia')" class="sortable-th">
+                        Permanência
+                        <span class="sort-indicator" *ngIf="movSortColumn === 'permanencia'">
+                          {{ movSortDirection === 'asc' ? '▲' : '▼' }}
+                        </span>
+                      </th>
+                      <th (click)="setMovSort('valor')" class="sortable-th">
+                        Valor Calculado
+                        <span class="sort-indicator" *ngIf="movSortColumn === 'valor'">
+                          {{ movSortDirection === 'asc' ? '▲' : '▼' }}
+                        </span>
+                      </th>
+                      <th (click)="setMovSort('status')" class="sortable-th">
+                        Status
+                        <span class="sort-indicator" *ngIf="movSortColumn === 'status'">
+                          {{ movSortDirection === 'asc' ? '▲' : '▼' }}
+                        </span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let m of customerMovements" [class.row-parked]="m.esta_estacionado">
+                    <tr *ngFor="let m of sortedCustomerMovements" [class.row-parked]="m.esta_estacionado">
                       <td>
                         <strong>{{ m.placa }}</strong>
                       </td>
@@ -319,7 +347,7 @@ type SortDirection = 'asc' | 'desc';
                 <label>Código Identificador</label>
                 <input
                   type="text"
-                  value="Gerado automaticamente pelo sistema (ex: CLI-0011)"
+                  value="Gerado automaticamente pelo sistema (ex: CLI-0021)"
                   disabled
                   class="form-control disabled-input"
                 />
@@ -648,16 +676,6 @@ type SortDirection = 'asc' | 'desc';
       color: #1e293b;
       vertical-align: middle;
     }
-    .code-badge {
-      background: #0f172a;
-      color: #f8fafc;
-      font-family: monospace;
-      padding: 0.25rem 0.55rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
     .plan-badge {
       display: inline-block;
       padding: 0.2rem 0.6rem;
@@ -822,7 +840,7 @@ type SortDirection = 'asc' | 'desc';
     }
     .doc-value {
       font-family: monospace;
-      font-weight: 600;
+      font-weight: 400;
     }
     .sub-section {
       margin-top: 1rem;
@@ -1016,9 +1034,13 @@ export class CustomersComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
 
-  // Ordenação
-  sortColumn: SortColumn = 'codigo';
+  // Ordenação da tabela principal (sem coluna código)
+  sortColumn: SortColumn = 'nome';
   sortDirection: SortDirection = 'asc';
+
+  // Ordenação da tabela de movimentações dos veículos do cliente
+  movSortColumn: MovSortColumn = 'entrada_em';
+  movSortDirection: SortDirection = 'desc';
 
   // Modal Novo Cliente
   showCustomerModal = false;
@@ -1034,7 +1056,6 @@ export class CustomersComponent implements OnInit {
     placa: '',
     marca: '',
     modelo: '',
-    cor: '',
     tipo: 'carro' as 'carro' | 'moto' | 'caminhao' | 'onibus',
   };
 
@@ -1045,7 +1066,6 @@ export class CustomersComponent implements OnInit {
     placa: '',
     marca: '',
     modelo: '',
-    cor: '',
     tipo: 'carro' as 'carro' | 'moto' | 'caminhao' | 'onibus',
   };
 
@@ -1080,7 +1100,7 @@ export class CustomersComponent implements OnInit {
     });
   }
 
-  // --- Ordenação ---
+  // --- Ordenação da Tabela Principal ---
   setSort(col: SortColumn): void {
     if (this.sortColumn === col) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -1097,7 +1117,6 @@ export class CustomersComponent implements OnInit {
       const q = this.searchQuery.toLowerCase();
       result = result.filter(
         (c) =>
-          (c.codigo && c.codigo.toLowerCase().includes(q)) ||
           c.nome.toLowerCase().includes(q) ||
           c.documento.includes(q) ||
           (c.telefone && c.telefone.toLowerCase().includes(q)) ||
@@ -1112,10 +1131,6 @@ export class CustomersComponent implements OnInit {
       let valB = '';
 
       switch (this.sortColumn) {
-        case 'codigo':
-          valA = a.codigo || '';
-          valB = b.codigo || '';
-          break;
         case 'nome':
           valA = a.nome || '';
           valB = b.nome || '';
@@ -1129,7 +1144,6 @@ export class CustomersComponent implements OnInit {
           valB = b.plano_tipo || '';
           break;
         case 'veiculos':
-          // Ordena pela quantidade de veículos ou primeira placa
           valA = a.veiculos?.[0]?.placa || '';
           valB = b.veiculos?.[0]?.placa || '';
           break;
@@ -1140,6 +1154,57 @@ export class CustomersComponent implements OnInit {
     });
 
     return result;
+  }
+
+  // --- Ordenação da Tabela de Movimentações nos Detalhes ---
+  setMovSort(col: MovSortColumn): void {
+    if (this.movSortColumn === col) {
+      this.movSortDirection = this.movSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.movSortColumn = col;
+      this.movSortDirection = 'asc';
+    }
+  }
+
+  get sortedCustomerMovements(): ClienteMovimentacao[] {
+    const list = [...this.customerMovements];
+    list.sort((a, b) => {
+      let valA: any = '';
+      let valB: any = '';
+
+      switch (this.movSortColumn) {
+        case 'placa':
+          valA = a.placa || '';
+          valB = b.placa || '';
+          return this.movSortDirection === 'asc'
+            ? valA.localeCompare(valB, 'pt-BR')
+            : valB.localeCompare(valA, 'pt-BR');
+        case 'entrada_em':
+        case 'hora_entrada':
+          valA = new Date(a.entrada_em).getTime();
+          valB = new Date(b.entrada_em).getTime();
+          return this.movSortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'saida_em':
+        case 'hora_saida':
+          valA = a.saida_em ? new Date(a.saida_em).getTime() : 0;
+          valB = b.saida_em ? new Date(b.saida_em).getTime() : 0;
+          return this.movSortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'permanencia':
+          valA = a.permanencia_minutos ?? -1;
+          valB = b.permanencia_minutos ?? -1;
+          return this.movSortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'valor':
+          valA = a.valor_calculado ?? -1;
+          valB = b.valor_calculado ?? -1;
+          return this.movSortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'status':
+          valA = a.esta_estacionado ? 1 : 0;
+          valB = b.esta_estacionado ? 1 : 0;
+          return this.movSortDirection === 'asc' ? valA - valB : valB - valA;
+      }
+      return 0;
+    });
+    return list;
   }
 
   formatPlan(plan?: string): string {
@@ -1166,6 +1231,8 @@ export class CustomersComponent implements OnInit {
     this.movementFilterPlate = '';
     this.movementFilterDateStart = '';
     this.movementFilterDateEnd = '';
+    this.movSortColumn = 'entrada_em';
+    this.movSortDirection = 'desc';
     this.showDetailsModal = true;
     this.loadMovementsForSelected();
   }
@@ -1284,7 +1351,6 @@ export class CustomersComponent implements OnInit {
       placa: '',
       marca: '',
       modelo: '',
-      cor: '',
       tipo: 'carro',
     };
     this.showCustomerModal = true;
@@ -1325,7 +1391,7 @@ export class CustomersComponent implements OnInit {
   openAddVehicleModal(cliente: Cliente): void {
     this.clearMessages();
     this.selectedCustomer = cliente;
-    this.newVehicle = { placa: '', marca: '', modelo: '', cor: '', tipo: 'carro' };
+    this.newVehicle = { placa: '', marca: '', modelo: '', tipo: 'carro' };
     this.showVehicleModal = true;
   }
 

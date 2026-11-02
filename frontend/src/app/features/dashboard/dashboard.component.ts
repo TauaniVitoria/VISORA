@@ -60,32 +60,6 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
             <span class="kpi-value text-blue">{{ metrics?.saidas_hoje ?? 0 }}</span>
           </div>
         </div>
-
-        <div class="kpi-card">
-          <div class="kpi-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="23"></line>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-          </div>
-          <div class="kpi-data">
-            <span class="kpi-label">Receita Registrada</span>
-            <span class="kpi-value text-emerald">R$ {{ (metrics?.receita_total_registrada ?? 0) | number:'1.2-2' }}</span>
-          </div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </div>
-          <div class="kpi-data">
-            <span class="kpi-label">Cobranças Pendentes</span>
-            <span class="kpi-value text-amber">R$ {{ (metrics?.cobrancas_pendentes_valor ?? 0) | number:'1.2-2' }}</span>
-          </div>
-        </div>
       </div>
 
       <!-- Quick Actions for ALPR / Manual Simulation -->
@@ -104,22 +78,6 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
               />
               <button class="btn-action-in" (click)="onRegisterEntry()" [disabled]="!entryPlate">
                 Registrar Entrada
-              </button>
-            </div>
-          </div>
-
-          <div class="action-box">
-            <label>Registrar Saída (Cancela)</label>
-            <div class="input-action-group">
-              <input
-                type="text"
-                [(ngModel)]="exitPlate"
-                placeholder="Ex: BRA2E19"
-                class="plate-input"
-                maxlength="10"
-              />
-              <button class="btn-action-out" (click)="onRegisterExit()" [disabled]="!exitPlate">
-                Registrar Saída
               </button>
             </div>
           </div>

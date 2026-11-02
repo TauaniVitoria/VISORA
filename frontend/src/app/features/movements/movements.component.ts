@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { Movimentacao } from '../../core/models/models';
 
+type SortColumn = 'placa' | 'entrada_em' | 'saida_em' | 'permanencia_minutos' | 'tipo_cobranca' | 'valor_devido' | 'status';
+type SortDirection = 'asc' | 'desc';
+
 @Component({
   selector: 'app-movements',
   standalone: true,
@@ -49,22 +52,57 @@ import { Movimentacao } from '../../core/models/models';
 
       <!-- Table Card -->
       <div class="content-card">
-        <div class="table-container" *ngIf="movements.length > 0; else emptyState">
+        <div class="table-container" *ngIf="sortedMovements.length > 0; else emptyState">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Placa</th>
-                <th>Entrada</th>
-                <th>Saída</th>
-                <th>Permanência</th>
-                <th>Tipo</th>
-                <th>Valor Devido</th>
-                <th>Status</th>
+                <th (click)="setSort('placa')" class="sortable-th">
+                  Placa
+                  <span class="sort-indicator" *ngIf="sortColumn === 'placa'">
+                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                <th (click)="setSort('entrada_em')" class="sortable-th">
+                  Entrada
+                  <span class="sort-indicator" *ngIf="sortColumn === 'entrada_em'">
+                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                <th (click)="setSort('saida_em')" class="sortable-th">
+                  Saída
+                  <span class="sort-indicator" *ngIf="sortColumn === 'saida_em'">
+                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                <th (click)="setSort('permanencia_minutos')" class="sortable-th">
+                  Permanência
+                  <span class="sort-indicator" *ngIf="sortColumn === 'permanencia_minutos'">
+                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                <th (click)="setSort('tipo_cobranca')" class="sortable-th">
+                  Tipo
+                  <span class="sort-indicator" *ngIf="sortColumn === 'tipo_cobranca'">
+                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                <th (click)="setSort('valor_devido')" class="sortable-th">
+                  Valor Devido
+                  <span class="sort-indicator" *ngIf="sortColumn === 'valor_devido'">
+                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
+                <th (click)="setSort('status')" class="sortable-th">
+                  Status
+                  <span class="sort-indicator" *ngIf="sortColumn === 'status'">
+                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let m of movements">
+              <tr *ngFor="let m of sortedMovements">
                 <td>
                   <span class="plate-badge">{{ m.placa }}</span>
                 </td>
@@ -77,7 +115,16 @@ import { Movimentacao } from '../../core/models/models';
                   </span>
                 </td>
                 <td>
-                  <strong>R$ {{ (m.cobranca?.valor_liquido ?? 0) | number:'1.2-2' }}</strong>
+                  <!-- Caso o cliente possua plano, valor devido é exibido como '-' -->
+                  <ng-container *ngIf="hasPlan(m); else valorCalculado">
+                    <span class="text-muted">-</span>
+                  </ng-container>
+                  <ng-template #valorCalculado>
+                    <strong *ngIf="m.cobranca && m.cobranca.valor_liquido !== null && m.cobranca.valor_liquido !== undefined; else semValor">
+                      R$ {{ m.cobranca.valor_liquido | number:'1.2-2' }}
+                    </strong>
+                    <ng-template #semValor>—</ng-template>
+                  </ng-template>
                 </td>
                 <td>
                   <span class="status-badge" [ngClass]="m.status">
@@ -138,21 +185,23 @@ import { Movimentacao } from '../../core/models/models';
               </div>
 
               <div class="form-group">
-                <label>Justificativa Obrigatória *</label>
+                <label>Justificativa / Motivo da Alteração * (Mín. 5 caracteres)</label>
                 <textarea
                   [(ngModel)]="correctionForm.observacao"
                   name="c_obs"
                   required
                   rows="3"
                   class="form-control"
-                  placeholder="Explique o motivo da correção (ex: 'Reflexo no leitor OCR causou leitura incorreta de B como 8')..."
+                  placeholder="Ex: Erro de leitura de OCR na câmera de saída..."
                 ></textarea>
               </div>
             </div>
 
             <div class="modal-footer">
               <button type="button" class="btn-secondary" (click)="showCorrectionModal = false">Cancelar</button>
-              <button type="submit" class="btn-primary" [disabled]="!correctionForm.observacao">Salvar Correção</button>
+              <button type="submit" class="btn-primary" [disabled]="!correctionForm.placa || correctionForm.observacao.length < 5">
+                Salvar Alteração
+              </button>
             </div>
           </form>
         </div>
@@ -165,17 +214,11 @@ import { Movimentacao } from '../../core/models/models';
     h2 { margin: 0; color: #0f172a; font-size: 1.5rem; font-weight: 700; }
     .subtitle { margin: 0.25rem 0 0; color: #64748b; font-size: 0.875rem; }
     .filter-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: flex-end;
-      gap: 1.25rem;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: flex-end;
+      gap: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex-wrap: wrap;
     }
-    .filter-group { flex: 1; max-width: 280px; }
+    .filter-group { flex: 1; min-width: 200px; }
     .filter-group label {
       display: block; font-size: 0.75rem; font-weight: 600; color: #475569; margin-bottom: 0.3rem;
     }
@@ -196,6 +239,21 @@ import { Movimentacao } from '../../core/models/models';
     .data-table th {
       background: #f8fafc; color: #64748b; font-size: 0.75rem; font-weight: 700;
       text-transform: uppercase; padding: 0.75rem 1rem; border-bottom: 1px solid #e2e8f0;
+      user-select: none;
+    }
+    .sortable-th {
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sortable-th:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .sort-indicator {
+      display: inline-block;
+      margin-left: 0.35rem;
+      font-size: 0.7rem;
+      color: #0284c7;
     }
     .data-table td {
       padding: 0.85rem 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.875rem; color: #1e293b;
@@ -217,6 +275,7 @@ import { Movimentacao } from '../../core/models/models';
       padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
     }
     .btn-action-edit:hover { background: #e0f2fe; }
+    .text-muted { color: #64748b; font-weight: 600; }
 
     /* Modais */
     .modal-backdrop {
@@ -263,6 +322,10 @@ export class MovementsComponent implements OnInit {
   plateFilter = '';
   statusFilter = '';
 
+  // Ordenação
+  sortColumn: SortColumn = 'entrada_em';
+  sortDirection: SortDirection = 'desc';
+
   showCorrectionModal = false;
   selectedMovement: Movimentacao | null = null;
   correctionForm = {
@@ -288,6 +351,66 @@ export class MovementsComponent implements OnInit {
         next: (res) => (this.movements = res),
         error: () => {},
       });
+  }
+
+  setSort(col: SortColumn): void {
+    if (this.sortColumn === col) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = col;
+      this.sortDirection = 'asc';
+    }
+  }
+
+  hasPlan(m: Movimentacao): boolean {
+    return !!m.tem_plano || m.tipo_cobranca?.toLowerCase() === 'plano' || m.tipo_cobranca?.toLowerCase() === 'mensalista';
+  }
+
+  get sortedMovements(): Movimentacao[] {
+    const list = [...this.movements];
+    list.sort((a, b) => {
+      let valA: any = '';
+      let valB: any = '';
+
+      switch (this.sortColumn) {
+        case 'placa':
+          valA = a.placa || '';
+          valB = b.placa || '';
+          return this.sortDirection === 'asc'
+            ? valA.localeCompare(valB, 'pt-BR')
+            : valB.localeCompare(valA, 'pt-BR');
+        case 'entrada_em':
+          valA = new Date(a.entrada_em).getTime();
+          valB = new Date(b.entrada_em).getTime();
+          return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'saida_em':
+          valA = a.saida_em ? new Date(a.saida_em).getTime() : 0;
+          valB = b.saida_em ? new Date(b.saida_em).getTime() : 0;
+          return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'permanencia_minutos':
+          valA = a.permanencia_minutos ?? -1;
+          valB = b.permanencia_minutos ?? -1;
+          return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'tipo_cobranca':
+          valA = a.tipo_cobranca || '';
+          valB = b.tipo_cobranca || '';
+          return this.sortDirection === 'asc'
+            ? valA.localeCompare(valB, 'pt-BR')
+            : valB.localeCompare(valA, 'pt-BR');
+        case 'valor_devido':
+          valA = this.hasPlan(a) ? -1 : (a.cobranca?.valor_liquido ?? 0);
+          valB = this.hasPlan(b) ? -1 : (b.cobranca?.valor_liquido ?? 0);
+          return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'status':
+          valA = a.status || '';
+          valB = b.status || '';
+          return this.sortDirection === 'asc'
+            ? valA.localeCompare(valB, 'pt-BR')
+            : valB.localeCompare(valA, 'pt-BR');
+      }
+      return 0;
+    });
+    return list;
   }
 
   openCorrectionModal(m: Movimentacao): void {

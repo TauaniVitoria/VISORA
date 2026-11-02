@@ -126,6 +126,7 @@ export interface Movimentacao {
   tipo_cobranca?: 'avulsa' | 'plano' | 'isento';
   observacao?: string;
   cobranca?: Cobranca;
+  tem_plano?: boolean;
 }
 
 export interface Pagamento {
