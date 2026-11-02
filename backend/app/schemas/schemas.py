@@ -285,11 +285,25 @@ class MovimentacaoEntrada(BaseModel):
     camera_id: Optional[uuid.UUID] = None
     timestamp: Optional[datetime] = None
 
+    @field_validator("placa", mode="before")
+    @classmethod
+    def normalize_placa(cls, v: str) -> str:
+        if isinstance(v, str):
+            return v.strip().upper().replace("-", "").replace(" ", "")
+        return v
+
 
 class MovimentacaoSaida(BaseModel):
     placa: str = Field(..., min_length=7, max_length=10)
     camera_id: Optional[uuid.UUID] = None
     timestamp: Optional[datetime] = None
+
+    @field_validator("placa", mode="before")
+    @classmethod
+    def normalize_placa(cls, v: str) -> str:
+        if isinstance(v, str):
+            return v.strip().upper().replace("-", "").replace(" ", "")
+        return v
 
 
 class MovimentacaoCorrecaoManual(BaseModel):

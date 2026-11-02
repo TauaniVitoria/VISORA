@@ -1,0 +1,14 @@
+{
+  "metrics": {
+    "video_path": "/private/var/folders/9t/25pm4hx15ql1rd37s9mvr7yh0000gn/T/pytest-of-tvitoriaferreira/pytest-3/test_alpr_process_video_endpoi0/test_gate_stream.mp4",
+    "total_frames_processed": 4,
+    "processing_time_seconds": 2.207,
+    "average_fps": 1.81,
+    "vehicles_detected_count": 0,
+    "plates_detected_count": 0,
+    "valid_plates_count": 0,
+    "invalid_plates_count": 0,
+    "confirmed_passages_count": 0
+  },
+  "events": []
+}

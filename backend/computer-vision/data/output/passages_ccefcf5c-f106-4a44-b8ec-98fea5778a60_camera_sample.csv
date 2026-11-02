@@ -1,0 +1,1 @@
+track_id,vehicle_class,plate,pattern,det_confidence,ocr_confidence,first_frame_idx,last_frame_idx,timestamp_sec,bbox_plate_x1,bbox_plate_y1,bbox_plate_x2,bbox_plate_y2,total_hits

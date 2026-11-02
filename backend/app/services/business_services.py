@@ -583,13 +583,24 @@ class MovementService:
         norm_plate = exit_in.placa.strip().upper().replace("-", "")
         exit_time = ensure_utc(exit_in.timestamp) if exit_in.timestamp else utc_now()
 
-        # 1. Localiza permanência aberta
-        open_stmt = select(Movimentacao).where(
-            Movimentacao.estacionamento_id == tenant_id,
-            Movimentacao.placa == norm_plate,
-            Movimentacao.status == MovimentacaoStatus.ABERTA.value,
+        # 1. Localiza permanência aberta (incluindo eventuais duplicatas de seed)
+        open_stmt = (
+            select(Movimentacao)
+            .where(
+                Movimentacao.estacionamento_id == tenant_id,
+                Movimentacao.placa == norm_plate,
+                Movimentacao.status == MovimentacaoStatus.ABERTA.value,
+            )
+            .order_by(Movimentacao.entrada_em.desc())
         )
-        mov = db.scalar(open_stmt)
+        open_movs = list(db.scalars(open_stmt).all())
+        mov = open_movs[0] if open_movs else None
+
+        # Caso existam registros duplicados em aberto para a mesma placa, encerra os excedentes
+        for extra_mov in open_movs[1:]:
+            extra_mov.saida_em = exit_time
+            extra_mov.permanencia_minutos = 0
+            extra_mov.status = MovimentacaoStatus.CONCLUIDA.value
 
         # 2. Quando não houver entrada correspondente, registra inconsistência
         if not mov:

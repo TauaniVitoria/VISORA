@@ -72,11 +72,17 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
               <input
                 type="text"
                 [(ngModel)]="entryPlate"
+                (keyup.enter)="onRegisterEntry()"
                 placeholder="Ex: BRA2E19"
                 class="plate-input"
                 maxlength="10"
               />
-              <button class="btn-action-in" (click)="onRegisterEntry()" [disabled]="!entryPlate">
+              <button
+                type="button"
+                class="btn-action-in"
+                (click)="onRegisterEntry()"
+                [disabled]="!entryPlate || !entryPlate.trim()"
+              >
                 Registrar Entrada
               </button>
             </div>
@@ -115,8 +121,8 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
                   <span class="plate-badge">{{ m.placa }}</span>
                 </td>
                 <td>
-                  <span class="charge-type-badge" [ngClass]="m.tipo_cobranca || 'avulsa'">
-                    {{ m.tipo_cobranca?.toUpperCase() || 'AVULSA' }}
+                  <span class="charge-type-badge" [ngClass]="(m.tem_plano || m.tipo_cobranca === 'plano') ? 'plano' : 'avulsa'">
+                    {{ (m.tem_plano || m.tipo_cobranca === 'plano') ? 'PLANO' : 'AVULSA' }}
                   </span>
                 </td>
                 <td>{{ m.entrada_em | date:'dd/MM/yyyy HH:mm:ss' }}</td>
@@ -430,34 +436,45 @@ export class DashboardComponent implements OnInit {
   }
 
   onRegisterEntry(): void {
-    if (!this.entryPlate) return;
+    const cleanPlate = (this.entryPlate || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!cleanPlate) return;
     this.clearNotifications();
 
-    this.api.registerEntry({ placa: this.entryPlate }).subscribe({
+    if (cleanPlate.length < 7) {
+      this.actionError = 'Informe uma placa válida com pelo menos 7 caracteres (Ex: BRA2E19).';
+      return;
+    }
+
+    this.api.registerEntry({ placa: cleanPlate }).subscribe({
       next: (mov) => {
         this.actionSuccess = `Entrada registrada com sucesso para o veículo placa ${mov.placa}!`;
         this.entryPlate = '';
         this.loadData();
       },
       error: (err) => {
-        this.actionError = err.error?.detail || 'Erro ao registrar entrada.';
+        this.actionError = this.extractErrorMessage(err, 'Erro ao registrar entrada.');
       },
     });
   }
 
   onRegisterExit(): void {
-    if (!this.exitPlate) return;
+    const cleanPlate = (this.exitPlate || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!cleanPlate) return;
     this.clearNotifications();
 
-    this.api.registerExit({ placa: this.exitPlate }).subscribe({
+    this.api.registerExit({ placa: cleanPlate }).subscribe({
       next: (mov) => {
-        const val = mov.cobranca ? `R$ ${mov.cobranca.valor_liquido}` : 'R$ 0.00';
+        const val = (mov.tem_plano || mov.tipo_cobranca === 'plano')
+          ? '-'
+          : mov.cobranca
+            ? `R$ ${mov.cobranca.valor_liquido}`
+            : 'R$ 0.00';
         this.actionSuccess = `Saída concluída para placa ${mov.placa}! Permanência: ${mov.permanencia_minutos} min. Valor: ${val}.`;
         this.exitPlate = '';
         this.loadData();
       },
       error: (err) => {
-        this.actionError = err.error?.detail || 'Erro ao registrar saída.';
+        this.actionError = this.extractErrorMessage(err, 'Erro ao registrar saída.');
       },
     });
   }
@@ -465,6 +482,15 @@ export class DashboardComponent implements OnInit {
   quickExit(placa: string): void {
     this.exitPlate = placa;
     this.onRegisterExit();
+  }
+
+  private extractErrorMessage(err: any, fallback: string): string {
+    const detail = err?.error?.detail;
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail) && detail.length > 0) {
+      return detail.map((d: any) => d.msg || JSON.stringify(d)).join('; ');
+    }
+    return fallback;
   }
 
   private clearNotifications(): void {

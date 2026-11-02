@@ -108,7 +108,7 @@ def seed_data() -> None:
                 "plano_tipo": "mensal",
                 "veiculos": [
                     {"placa": "BRA2E19", "marca": "Toyota", "modelo": "Corolla XEi", "cor": "Prata", "tipo": "carro"},
-                    {"placa": "SP1M90", "marca": "Honda", "modelo": "PCX 150", "cor": "Cinza", "tipo": "moto"},
+                    {"placa": "SPM1A90", "marca": "Honda", "modelo": "PCX 150", "cor": "Cinza", "tipo": "moto"},
                 ],
             },
             {
@@ -169,7 +169,7 @@ def seed_data() -> None:
                 "telefone": "(11) 93210-9876",
                 "plano_tipo": "mensal",
                 "veiculos": [
-                    {"placa": "SP1234", "marca": "Chevrolet", "modelo": "Onix Premier", "cor": "Prata", "tipo": "carro"},
+                    {"placa": "SPF1234", "marca": "Chevrolet", "modelo": "Onix Premier", "cor": "Prata", "tipo": "carro"},
                 ],
             },
             {
@@ -515,12 +515,19 @@ def seed_data() -> None:
             veiculo, cliente = veiculos_criados[placa]
             entrada_em = now - timedelta(hours=cen["delta_entrada_horas"])
 
-            # Verificar se já existe movimentação idêntica
-            existente = db.query(Movimentacao).filter_by(
-                estacionamento_id=estacionamento.id,
-                placa=placa,
-                entrada_em=entrada_em
-            ).first()
+            # Verificar se já existe movimentação idêntica ou já aberta para a placa
+            if cen["esta_estacionado"]:
+                existente = db.query(Movimentacao).filter_by(
+                    estacionamento_id=estacionamento.id,
+                    placa=placa,
+                    status=MovimentacaoStatus.ABERTA.value,
+                ).first()
+            else:
+                existente = db.query(Movimentacao).filter_by(
+                    estacionamento_id=estacionamento.id,
+                    placa=placa,
+                    entrada_em=entrada_em,
+                ).first()
 
             if not existente:
                 if cen["esta_estacionado"]:

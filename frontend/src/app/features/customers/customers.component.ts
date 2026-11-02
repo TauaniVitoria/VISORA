@@ -702,15 +702,15 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       letter-spacing: 0.05em;
     }
     .btn-details {
-      background: #ffffff;
-      border: 1px solid #0284c7;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
       color: #0284c7;
       padding: 0.35rem 0.75rem;
       border-radius: 6px;
       font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: background 0.15s;
     }
     .btn-details:hover {
       background: #e0f2fe;
