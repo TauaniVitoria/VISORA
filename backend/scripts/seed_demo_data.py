@@ -424,9 +424,9 @@ def seed_data() -> None:
                 "esta_estacionado": False,
                 "valor": Decimal("20.00"),
             },
-            # 3. Movimentação ativa agora (BRA2E19 - Carlos Silva está estacionado!)
+            # 3. Movimentação ativa agora (JKG4512 - Juliana Castro está estacionada!)
             {
-                "placa": "BRA2E19",
+                "placa": "JKG4512",
                 "delta_entrada_horas": 1.5,
                 "duracao_minutos": None,
                 "esta_estacionado": True,

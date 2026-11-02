@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
@@ -70,9 +70,12 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
             <label>Registrar Entrada (Veículo)</label>
             <div class="input-action-group">
               <input
+                #plateInput
                 type="text"
+                name="entryPlate"
                 [(ngModel)]="entryPlate"
-                (keyup.enter)="onRegisterEntry()"
+                (input)="entryPlate = plateInput.value"
+                (keyup.enter)="onRegisterEntry(plateInput.value)"
                 placeholder="Ex: BRA2E19"
                 class="plate-input"
                 maxlength="10"
@@ -80,8 +83,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
               <button
                 type="button"
                 class="btn-action-in"
-                (click)="onRegisterEntry()"
-                [disabled]="!entryPlate || !entryPlate.trim()"
+                (click)="onRegisterEntry(plateInput.value)"
               >
                 Registrar Entrada
               </button>
@@ -288,9 +290,9 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.15s;
     }
-    .btn-action-in:hover:not(:disabled) { background: #0369a1; }
-    .btn-action-in:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-action-in:hover { background: #0369a1; }
     .btn-action-out {
       background: #dc2626;
       color: white;
@@ -410,6 +412,9 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
 })
 export class DashboardComponent implements OnInit {
   private api = inject(ApiService);
+  private cdr = inject(ChangeDetectorRef);
+
+  @ViewChild('plateInput') plateInputRef?: ElementRef<HTMLInputElement>;
 
   metrics: DashboardMetrics | null = null;
   activeMovements: Movimentacao[] = [];
@@ -425,23 +430,38 @@ export class DashboardComponent implements OnInit {
 
   loadData(): void {
     this.api.getDashboardMetrics().subscribe({
-      next: (m) => (this.metrics = m),
+      next: (m) => {
+        this.metrics = m;
+        this.cdr.detectChanges();
+      },
       error: () => {},
     });
 
     this.api.getActiveMovements().subscribe({
-      next: (movs) => (this.activeMovements = movs),
+      next: (movs) => {
+        this.activeMovements = movs;
+        this.cdr.detectChanges();
+      },
       error: () => {},
     });
   }
 
-  onRegisterEntry(): void {
-    const cleanPlate = (this.entryPlate || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (!cleanPlate) return;
+  onRegisterEntry(rawInput?: string): void {
     this.clearNotifications();
+    const candidate = rawInput ?? this.plateInputRef?.nativeElement?.value ?? this.entryPlate ?? '';
+    const cleanPlate = candidate.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
 
-    if (cleanPlate.length < 7) {
-      this.actionError = 'Informe uma placa válida com pelo menos 7 caracteres (Ex: BRA2E19).';
+    if (!cleanPlate) {
+      this.actionError = 'Informe a placa do veículo para registrar a entrada (Ex: BRA2E19).';
+      this.plateInputRef?.nativeElement?.focus();
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (cleanPlate.length < 3) {
+      this.actionError = 'Informe uma placa válida (Ex: BRA2E19).';
+      this.plateInputRef?.nativeElement?.focus();
+      this.cdr.detectChanges();
       return;
     }
 
@@ -449,10 +469,23 @@ export class DashboardComponent implements OnInit {
       next: (mov) => {
         this.actionSuccess = `Entrada registrada com sucesso para o veículo placa ${mov.placa}!`;
         this.entryPlate = '';
+        if (this.plateInputRef?.nativeElement) {
+          this.plateInputRef.nativeElement.value = '';
+        }
+        this.activeMovements = [mov, ...this.activeMovements.filter((m) => m.id !== mov.id)];
+        if (this.metrics) {
+          this.metrics = {
+            ...this.metrics,
+            veiculos_estacionados_agora: (this.metrics.veiculos_estacionados_agora ?? 0) + 1,
+            entradas_hoje: (this.metrics.entradas_hoje ?? 0) + 1,
+          };
+        }
+        this.cdr.detectChanges();
         this.loadData();
       },
       error: (err) => {
         this.actionError = this.extractErrorMessage(err, 'Erro ao registrar entrada.');
+        this.cdr.detectChanges();
       },
     });
   }
@@ -471,10 +504,13 @@ export class DashboardComponent implements OnInit {
             : 'R$ 0.00';
         this.actionSuccess = `Saída concluída para placa ${mov.placa}! Permanência: ${mov.permanencia_minutos} min. Valor: ${val}.`;
         this.exitPlate = '';
+        this.activeMovements = this.activeMovements.filter((m) => m.placa !== mov.placa);
+        this.cdr.detectChanges();
         this.loadData();
       },
       error: (err) => {
         this.actionError = this.extractErrorMessage(err, 'Erro ao registrar saída.');
+        this.cdr.detectChanges();
       },
     });
   }

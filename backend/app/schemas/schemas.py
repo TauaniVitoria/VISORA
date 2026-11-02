@@ -281,7 +281,7 @@ class AssinaturaOut(BaseModel):
 
 # --- Movimentação e ALPR ---
 class MovimentacaoEntrada(BaseModel):
-    placa: str = Field(..., min_length=7, max_length=10)
+    placa: str = Field(..., min_length=3, max_length=10)
     camera_id: Optional[uuid.UUID] = None
     timestamp: Optional[datetime] = None
 
@@ -294,7 +294,7 @@ class MovimentacaoEntrada(BaseModel):
 
 
 class MovimentacaoSaida(BaseModel):
-    placa: str = Field(..., min_length=7, max_length=10)
+    placa: str = Field(..., min_length=3, max_length=10)
     camera_id: Optional[uuid.UUID] = None
     timestamp: Optional[datetime] = None
 
