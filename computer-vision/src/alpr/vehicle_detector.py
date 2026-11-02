@@ -65,7 +65,14 @@ class VehicleDetector:
 
     def _load_model(self) -> YOLO:
         """Carrega o modelo YOLO utilizando a biblioteca ultralytics."""
-        model = YOLO(self.model_name)
+        from pathlib import Path
+
+        candidate = Path(self.model_name)
+        if not candidate.exists():
+            root_candidate = Path(__file__).resolve().parents[3] / self.model_name
+            if root_candidate.exists():
+                candidate = root_candidate
+        model = YOLO(str(candidate))
         return model
 
     def detect(self, frame: np.ndarray) -> List[VehicleDetection]:

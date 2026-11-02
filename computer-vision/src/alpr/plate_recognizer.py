@@ -22,6 +22,7 @@ class RecognitionResult:
     confidence: float        # Confiança estimada [0.0, 1.0]
     raw_characters: str      # Sequência antes de pós-processamento
     is_trained_weights: bool # True se foi inferido com pesos treinados carregados
+    model_used: str = "crnn_ctc"
 
 
 class CRNNNet(nn.Module):
@@ -137,9 +138,20 @@ class PlateRecognizer:
 
         self.model = CRNNNet(img_channels=1, num_classes=self.num_classes)
         self.is_weights_loaded = False
+        self._easyocr_reader = None
         self._load_weights_if_available()
         self.model.to(self.device)
         self.model.eval()
+
+    def _get_easyocr_reader(self):
+        """Inicializa sob demanda o leitor EasyOCR como motor secundário de confirmação."""
+        if self._easyocr_reader is None:
+            try:
+                import easyocr
+                self._easyocr_reader = easyocr.Reader(["en"], gpu=False, verbose=False)
+            except Exception:
+                self._easyocr_reader = False
+        return self._easyocr_reader if self._easyocr_reader is not False else None
 
     def _resolve_device(self, requested_device: str) -> torch.device:
         """Resolve o torch.device apropriado (mps, cuda ou cpu)."""
@@ -153,9 +165,16 @@ class PlateRecognizer:
 
     def _load_weights_if_available(self) -> None:
         """Carrega os pesos pré-treinados do modelo se disponíveis em disco."""
-        if self.model_path.exists() and self.model_path.is_file():
+        candidate = self.model_path
+        if not candidate.exists() and str(self.model_path) == "models/weights/crnn_plate_recognition.pth":
+            cv_root_candidate = Path(__file__).resolve().parents[2] / self.model_path
+            if cv_root_candidate.exists():
+                candidate = cv_root_candidate
+                self.model_path = candidate
+
+        if candidate.exists() and candidate.is_file():
             try:
-                state_dict = torch.load(self.model_path, map_location=self.device)
+                state_dict = torch.load(candidate, map_location=self.device)
                 self.model.load_state_dict(state_dict)
                 self.is_weights_loaded = True
             except Exception as e:
@@ -199,13 +218,20 @@ class PlateRecognizer:
 
         return text, confidence
 
-    def recognize(self, preprocessed_image: np.ndarray) -> RecognitionResult:
+    def recognize(
+        self,
+        preprocessed_image: np.ndarray,
+        raw_plate_crop: Optional[np.ndarray] = None,
+    ) -> RecognitionResult:
         """
         Executa a inferência OCR na imagem pré-processada de uma placa.
+        Utiliza CRNN + CTC como motor primário e EasyOCR como confirmação secundária
+        quando necessário em recortes reais.
 
         Args:
             preprocessed_image: Array numpy float32 normalizado com shape (H=32, W=128)
                                 ou imagem BGR/Grayscale.
+            raw_plate_crop: Recorte BGR/Grayscale original da placa para fallback EasyOCR.
 
         Returns:
             RecognitionResult com texto, confiança e metadados.
@@ -224,7 +250,7 @@ class PlateRecognizer:
             img = cv2.resize(img, (self.img_width, self.img_height), interpolation=cv2.INTER_AREA)
 
         # Garantir normalização float32 [0.0, 1.0]
-        if img.dtype != np.float32:
+        if img.dtype != np.float32 or float(img.max()) > 1.5:
             img = img.astype(np.float32) / 255.0
 
         # Normalização padrão z-score (média 0.5, desvio 0.5)
@@ -237,20 +263,83 @@ class PlateRecognizer:
             decoded_text, confidence = self.decode_ctc_greedy(logits)
 
         # Se não houver pesos carregados, documenta que os pesos não foram fornecidos
-        # Não gera texto fictício arbitrário
         if not self.is_weights_loaded:
-            # Em modo sem pesos treinados, reporta o resultado cru da rede não treinada
             return RecognitionResult(
                 text=decoded_text,
                 confidence=confidence,
                 raw_characters=decoded_text,
                 is_trained_weights=False,
+                model_used="crnn_ctc_untrained",
             )
+
+        # Se a CRNN treinada já decodificou 7 caracteres com altíssima confiança (>= 0.92), retorna imediatamente
+        if len(decoded_text) == 7 and confidence >= 0.92:
+            return RecognitionResult(
+                text=decoded_text,
+                confidence=round(confidence, 4),
+                raw_characters=decoded_text,
+                is_trained_weights=True,
+                model_used="crnn_ctc",
+            )
+
+        # Motor híbrido CRNN + EasyOCR quando a confiança da CRNN é < 0.92 ou tamanho != 7:
+        # EasyOCR verifica a presença real de caracteres na placa (evitando alucinações em regiões sem texto),
+        # enquanto a CRNN refina leituras parcialmente borradas/sombreadas que compartilham estrutura com o texto lido.
+        if raw_plate_crop is not None and raw_plate_crop.size > 0:
+            reader = self._get_easyocr_reader()
+            if reader is not None:
+                try:
+                    up = cv2.resize(raw_plate_crop, (0, 0), fx=2.5, fy=2.5, interpolation=cv2.INTER_CUBIC)
+                    gray_up = cv2.cvtColor(up, cv2.COLOR_BGR2GRAY) if len(up.shape) == 3 else up
+                    ocr_out = reader.readtext(gray_up, detail=1, allowlist=self.character_set)
+
+                    best_e_txt = ""
+                    best_e_conf = 0.0
+                    for _, e_txt, e_conf in ocr_out:
+                        clean_e = "".join(ch for ch in e_txt.strip().upper() if ch.isalnum())
+                        if len(clean_e) > len(best_e_txt) or (len(clean_e) == len(best_e_txt) and float(e_conf) > best_e_conf):
+                            best_e_txt = clean_e
+                            best_e_conf = float(e_conf)
+
+                    # Se nenhum caractere legível foi detectado pelo detector textual CRAFT/EasyOCR, rejeita falso positivo
+                    if len(best_e_txt) < 4:
+                        return RecognitionResult(
+                            text="",
+                            confidence=0.0,
+                            raw_characters=best_e_txt,
+                            is_trained_weights=True,
+                            model_used="hybrid_rejected_no_text",
+                        )
+
+                    # Se a CRNN gerou 7 caracteres e compartilha >= 3 caracteres com a leitura do EasyOCR,
+                    # e o EasyOCR teve confiança moderada (< 0.80) ou tamanho != 7, prioriza o refinamento da CRNN
+                    if len(decoded_text) == 7 and confidence >= 0.75:
+                        shared = sum(1 for ch in set(decoded_text) if ch in best_e_txt)
+                        if shared >= 3 and (best_e_conf < 0.80 or len(best_e_txt) != 7):
+                            return RecognitionResult(
+                                text=decoded_text,
+                                confidence=round(max(confidence, best_e_conf), 4),
+                                raw_characters=best_e_txt,
+                                is_trained_weights=True,
+                                model_used="crnn_ctc+easyocr",
+                            )
+
+                    # Caso contrário, utiliza a leitura direta do EasyOCR
+                    return RecognitionResult(
+                        text=best_e_txt,
+                        confidence=round(best_e_conf, 4),
+                        raw_characters=best_e_txt,
+                        is_trained_weights=True,
+                        model_used="easyocr",
+                    )
+                except Exception:
+                    pass
 
         return RecognitionResult(
             text=decoded_text,
-            confidence=confidence,
+            confidence=round(confidence, 4),
             raw_characters=decoded_text,
             is_trained_weights=True,
+            model_used="crnn_ctc",
         )
 

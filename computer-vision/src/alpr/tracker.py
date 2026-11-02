@@ -50,6 +50,7 @@ class Track:
         self.last_timestamp_sec = timestamp_sec
         self.disappeared_frames = 0
         self.event_emitted = False
+        self.emitted_plates: set[str] = set()
         self.observations: List[PlateObservation] = []
 
     @property
@@ -66,6 +67,15 @@ class Track:
 
     def update_bbox(self, bbox: Tuple[int, int, int, int], frame_idx: int, timestamp_sec: float) -> None:
         """Atualiza a posição do veículo no quadro corrente."""
+        old_y2 = self.bbox[3]
+        new_y2 = bbox[3]
+        # Se a borda inferior saltou significativamente para cima (> 120px), o veículo anterior
+        # saiu pela base do quadro e a caixa associou-se ao próximo veículo da fila
+        if old_y2 - new_y2 > 120:
+            self.observations.clear()
+            self.event_emitted = False
+            self.first_frame_idx = frame_idx
+
         self.bbox = bbox
         self.last_frame_idx = frame_idx
         self.last_timestamp_sec = timestamp_sec
@@ -224,7 +234,7 @@ class VehicleTracker:
                     self.tracks[self._next_track_id] = t
                     self._next_track_id += 1
 
-        # 2. Associa as observações de placas aos tracks mais próximos
+        # 2. Associa as observações de placas aos tracks mais próximos (priorizando região frontal/traseira inferior do veículo)
         for obs in plate_detections:
             px1, py1, px2, py2 = obs.bbox
             pcx, pcy = (px1 + px2) / 2.0, (py1 + py2) / 2.0
@@ -234,9 +244,12 @@ class VehicleTracker:
 
             for tid, track in self.tracks.items():
                 vx1, vy1, vx2, vy2 = track.bbox
-                # Verifica se a placa está dentro ou próxima da bounding box do veículo
-                if vx1 <= pcx <= vx2 and vy1 <= pcy <= vy2:
-                    dist = (track.centroid[0] - pcx) ** 2 + (track.centroid[1] - pcy) ** 2
+                vh = max(1.0, float(vy2 - vy1))
+                # Verifica se a placa está contida na caixa do veículo (na metade/terço inferior)
+                if vx1 <= pcx <= vx2 and (vy1 + 0.20 * vh) <= pcy <= vy2:
+                    anchor_x = (vx1 + vx2) / 2.0
+                    anchor_y = vy1 + 0.75 * vh
+                    dist = (anchor_x - pcx) ** 2 + (anchor_y - pcy) ** 2
                     if dist < best_dist:
                         best_dist = dist
                         best_tid = tid
@@ -250,6 +263,10 @@ class VehicleTracker:
                 consolidated = track.get_consolidated_plate()
                 if consolidated is not None:
                     plate, pattern, det_conf, ocr_conf, bbox = consolidated
+                    # Verifica se a placa vencedora atingiu a contagem mínima de leituras consistentes
+                    plate_hits = sum(1 for o in track.observations if o.plate == plate)
+                    if plate_hits < self.confirmation_hits:
+                        continue
 
                     # Checar cooldown para esta placa
                     last_seen_time = self._plate_cooldown_history.get(plate, -float("inf"))
@@ -267,10 +284,11 @@ class VehicleTracker:
                             last_frame_idx=track.last_frame_idx,
                             timestamp_sec=timestamp_sec,
                             bbox_plate=bbox,
-                            total_hits=len(track.observations),
+                            total_hits=plate_hits,
                         )
                         new_confirmed_events.append(event)
                         track.event_emitted = True
+                        track.emitted_plates.add(plate)
                         self._plate_cooldown_history[plate] = timestamp_sec
 
         # 4. Remover tracks que excederam o limite de quadros desaparecidos

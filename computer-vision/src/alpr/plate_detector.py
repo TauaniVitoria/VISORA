@@ -65,8 +65,15 @@ class PlateDetector:
         Carrega os pesos dedicados de detecção de placas caso o arquivo exista.
         Não gera pesos fictícios caso o arquivo não seja encontrado.
         """
-        if self.model_path.exists() and self.model_path.is_file():
-            self.model = YOLO(str(self.model_path))
+        candidate = self.model_path
+        if not candidate.exists() and str(self.model_path) == "models/weights/plate_detector_yolo.pt":
+            cv_root_candidate = Path(__file__).resolve().parents[2] / self.model_path
+            if cv_root_candidate.exists():
+                candidate = cv_root_candidate
+                self.model_path = candidate
+
+        if candidate.exists() and candidate.is_file():
+            self.model = YOLO(str(candidate))
         else:
             self.model = None
 
@@ -74,6 +81,108 @@ class PlateDetector:
     def is_model_available(self) -> bool:
         """Indica se os pesos do modelo especializado de placas estão carregados."""
         return self.model is not None
+
+    def _detect_morphological_candidates(
+        self,
+        vehicle_crop: np.ndarray,
+        vehicle_bbox: Tuple[int, int, int, int],
+        frame_shape: Tuple[int, int],
+    ) -> List[PlateDetection]:
+        """
+        Localizador morfológico complementar baseado em Black-Hat, gradiente vertical Sobel-X
+        e geometria retangular de placas brasileiras na região frontal/traseira do veículo.
+        """
+        h_veh, w_veh = vehicle_crop.shape[:2]
+        h_orig, w_orig = frame_shape[:2]
+        vx1, vy1, _, _ = vehicle_bbox
+        detections: List[PlateDetection] = []
+
+        if h_veh < 36 or w_veh < 60 or int(vehicle_crop.max()) == 0:
+            return detections
+
+        # 1. Busca por caracteres escuros sobre fundo claro (Black-Hat + Sobel-X) nos 75% inferiores do veículo
+        y_start = int(h_veh * 0.25)
+        roi = vehicle_crop[y_start:, :]
+        gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY) if len(roi.shape) == 3 else roi
+
+        rect_kern = cv2.getStructuringElement(cv2.MORPH_RECT, (17, 5))
+        blackhat = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, rect_kern)
+        grad_x = cv2.Sobel(blackhat, ddepth=cv2.CV_32F, dx=1, dy=0, ksize=-1)
+        grad_x = np.absolute(grad_x)
+        min_v, max_v = float(np.min(grad_x)), float(np.max(grad_x))
+        if max_v > min_v:
+            grad_x = 255.0 * ((grad_x - min_v) / (max_v - min_v))
+        grad_x_u8 = grad_x.astype("uint8")
+        grad_x_u8 = cv2.GaussianBlur(grad_x_u8, (5, 5), 0)
+        grad_x_u8 = cv2.morphologyEx(grad_x_u8, cv2.MORPH_CLOSE, rect_kern)
+        _, thresh = cv2.threshold(grad_x_u8, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        thresh = cv2.erode(thresh, None, iterations=1)
+        thresh = cv2.dilate(thresh, None, iterations=2)
+
+        cnts, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        scored_boxes: List[Tuple[float, Tuple[int, int, int, int], float]] = []
+
+        for c in cnts:
+            x, y, cw, ch = cv2.boundingRect(c)
+            if ch <= 0 or cw <= 0:
+                continue
+            ar = float(cw) / float(ch)
+            if 1.8 <= ar <= 6.0 and cw >= 48 and ch >= 14 and cw <= w_veh * 0.70:
+                cx = x + cw / 2.0
+                center_dist = abs(cx - (w_veh / 2.0)) / max(1.0, (w_veh / 2.0))
+                if center_dist > 0.50:
+                    continue
+                px = int(cw * 0.10)
+                py = int(ch * 0.18)
+                lx1_c = max(0, x - px)
+                ly1_c = max(0, y + y_start - py)
+                lx2_c = min(w_veh, x + cw + px)
+                ly2_c = min(h_veh, y + y_start + ch + py)
+                final_w = lx2_c - lx1_c
+                final_h = ly2_c - ly1_c
+                if final_h <= 0 or final_w <= 0:
+                    continue
+                final_ar = float(final_w) / float(final_h)
+                if not (self.min_aspect_ratio <= final_ar <= max(self.max_aspect_ratio, 5.5)):
+                    continue
+                score = (cw * ch) * (1.0 - 0.45 * center_dist)
+                conf = min(0.92, max(0.55, 0.85 * (1.0 - 0.3 * center_dist)))
+                scored_boxes.append((score, (lx1_c, ly1_c, lx2_c, ly2_c), conf))
+
+        # 2. Busca complementar por retângulo claro de alto contraste (placas sintéticas / iluminação direta)
+        if not scored_boxes:
+            full_gray = cv2.cvtColor(vehicle_crop, cv2.COLOR_BGR2GRAY) if len(vehicle_crop.shape) == 3 else vehicle_crop
+            _, bright_th = cv2.threshold(full_gray, 200, 255, cv2.THRESH_BINARY)
+            b_cnts, _ = cv2.findContours(bright_th, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            for c in b_cnts:
+                x, y, cw, ch = cv2.boundingRect(c)
+                if ch <= 0 or cw <= 0:
+                    continue
+                ar = float(cw) / float(ch)
+                if self.min_aspect_ratio <= ar <= self.max_aspect_ratio and cw >= 50 and ch >= 16 and cw <= w_veh * 0.95:
+                    scored_boxes.append((float(cw * ch), (x, y, x + cw, y + ch), 0.88))
+
+        scored_boxes.sort(key=lambda item: item[0], reverse=True)
+        for _, (lx1_c, ly1_c, lx2_c, ly2_c), conf in scored_boxes[:1]:
+            crop_w = lx2_c - lx1_c
+            crop_h = ly2_c - ly1_c
+            aspect_ratio = float(crop_w) / float(crop_h)
+            gx1 = max(0, min(w_orig - 1, vx1 + lx1_c))
+            gy1 = max(0, min(h_orig - 1, vy1 + ly1_c))
+            gx2 = max(gx1 + 1, min(w_orig, vx1 + lx2_c))
+            gy2 = max(gy1 + 1, min(h_orig, vy1 + ly2_c))
+            plate_crop = vehicle_crop[ly1_c:ly2_c, lx1_c:lx2_c].copy()
+            if plate_crop.size > 0:
+                detections.append(
+                    PlateDetection(
+                        bbox=(gx1, gy1, gx2, gy2),
+                        local_bbox=(lx1_c, ly1_c, lx2_c, ly2_c),
+                        confidence=round(conf, 4),
+                        crop=plate_crop,
+                        aspect_ratio=round(aspect_ratio, 4),
+                    )
+                )
+        return detections
 
     def detect_in_vehicle(
         self,
@@ -167,6 +276,19 @@ class PlateDetector:
                     crop=plate_crop,
                     aspect_ratio=aspect_ratio,
                 )
+            )
+
+        # Seleciona a placa de maior confiança para o veículo atual
+        if len(detections) > 1:
+            detections.sort(key=lambda d: d.confidence, reverse=True)
+            detections = detections[:1]
+
+        # Fallback morfológico quando o modelo real YOLO não captura placas pequenas/sombreadas
+        if not detections and isinstance(self.model, YOLO):
+            detections = self._detect_morphological_candidates(
+                vehicle_crop=vehicle_crop,
+                vehicle_bbox=vehicle_bbox,
+                frame_shape=frame_shape,
             )
 
         return detections

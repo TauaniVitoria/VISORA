@@ -85,3 +85,26 @@ def test_no_arbitrary_character_substitution(validator: PlateValidator):
     # Mantém o '8' original sem inventar 'B'
     assert res.normalized_plate == "AB81D23"
     assert "não corresponde aos padrões" in res.error_message
+
+
+@pytest.mark.parametrize(
+    "ocr_raw,expected_plate,expected_pattern",
+    [
+        ("FTNIF16", "FTN1F16", PlatePattern.MERCOSUL),   # 'I' na posição 3 (dígito) -> '1'
+        ("CFTNIF16", "FTN1F16", PlatePattern.MERCOSUL),  # Artefato lateral 'BR' (8 chars) + 'I' -> '1'
+        ("EZVO448", "EZV0448", PlatePattern.ANTIGO),     # 'O' na posição 3 (dígito) -> '0'
+        ("8RA2E19", "BRA2E19", PlatePattern.MERCOSUL),   # '8' na posição 0 (letra) -> 'B'
+        ("TEK3J3Z", "TEK3J32", PlatePattern.MERCOSUL),   # 'Z' na posição 6 (dígito) -> '2'
+    ],
+)
+def test_validate_ocr_positional_disambiguation(
+    validator: PlateValidator,
+    ocr_raw: str,
+    expected_plate: str,
+    expected_pattern: PlatePattern,
+):
+    """Valida a correção posicional estrita do OCR respeitando a sintaxe das placas brasileiras."""
+    res = validator.validate_ocr(ocr_raw)
+    assert res.is_valid
+    assert res.normalized_plate == expected_plate
+    assert res.pattern == expected_pattern

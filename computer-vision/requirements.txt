@@ -5,6 +5,7 @@
 torch>=2.2.0
 torchvision>=0.17.0
 ultralytics>=8.1.0
+easyocr>=1.7.0
 
 # Image & Video Processing
 opencv-python>=4.9.0

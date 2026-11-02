@@ -41,6 +41,29 @@ class PlateValidator:
     # Regex para padrão Mercosul: 3 letras, 1 dígito, 1 letra, 2 dígitos
     REGEX_MERCOSUL = re.compile(r"^[A-Z]{3}[0-9][A-Z][0-9]{2}$")
 
+    # Mapeamentos posicionais estritos para desambiguação de confusões ópticas do OCR
+    DIGIT_TO_LETTER = {
+        "0": "O",
+        "1": "I",
+        "2": "Z",
+        "4": "A",
+        "5": "S",
+        "6": "G",
+        "8": "B",
+    }
+    LETTER_TO_DIGIT = {
+        "O": "0",
+        "Q": "0",
+        "D": "0",
+        "I": "1",
+        "L": "1",
+        "T": "1",
+        "Z": "2",
+        "S": "5",
+        "G": "6",
+        "B": "8",
+    }
+
     def __init__(self, strip_special_chars: bool = True):
         self.strip_special_chars = strip_special_chars
 
@@ -125,4 +148,98 @@ class PlateValidator:
             raw_text=raw_text,
             error_message="Sequência de caracteres não corresponde aos padrões Mercosul (ABC1D23) nem Antigo (ABC1234).",
         )
+
+    def _apply_positional_correction_7(self, candidate: str) -> Optional[str]:
+        """
+        Aplica correção de caracteres visualmente ambíguos (O/0, I/1, B/8, S/5, Z/2)
+        respeitando estritamente a posição esperada no padrão brasileiro (LLLNLNN ou LLLNNNN).
+        Limite máximo de 2 substituições posicionais para evitar falsos positivos.
+        """
+        if len(candidate) != 7:
+            return None
+
+        chars = list(candidate)
+        subs = 0
+
+        # Posições 0, 1, 2: obrigatoriamente LETRAS [A-Z]
+        for pos in (0, 1, 2):
+            ch = chars[pos]
+            if ch.isdigit():
+                mapped = self.DIGIT_TO_LETTER.get(ch)
+                if not mapped:
+                    return None
+                chars[pos] = mapped
+                subs += 1
+
+        # Posição 3: obrigatoriamente DÍGITO [0-9]
+        if chars[3].isalpha():
+            mapped = self.LETTER_TO_DIGIT.get(chars[3])
+            if not mapped:
+                return None
+            chars[3] = mapped
+            subs += 1
+
+        # Posição 4: pode ser LETRA (Mercosul) ou DÍGITO (Antigo) -> preserva como está se alfanumérico
+        if not chars[4].isalnum():
+            return None
+
+        # Posições 5, 6: obrigatoriamente DÍGITOS [0-9]
+        for pos in (5, 6):
+            ch = chars[pos]
+            if ch.isalpha():
+                mapped = self.LETTER_TO_DIGIT.get(ch)
+                if not mapped:
+                    return None
+                chars[pos] = mapped
+                subs += 1
+
+        if subs > 2:
+            return None
+
+        corrected = "".join(chars)
+        if self.REGEX_MERCOSUL.match(corrected) or self.REGEX_ANTIGO.match(corrected):
+            return corrected
+        return None
+
+    def validate_ocr(self, raw_text: str) -> ValidationResult:
+        """
+        Valida saída do OCR com suporte a desambiguação posicional brasileira e remoção
+        de artefato de borda ('BR' lateral em placas Mercosul que gera 8 caracteres).
+        """
+        direct = self.validate(raw_text)
+        if direct.is_valid:
+            return direct
+
+        normalized = self.normalize(raw_text)
+        candidates_7 = []
+        if len(normalized) == 7:
+            candidates_7.append(normalized)
+        elif len(normalized) == 8:
+            # Borda esquerda "BR" em placas Mercosul frequentemente adiciona 1 letra inicial
+            candidates_7.append(normalized[1:])
+            candidates_7.append(normalized[:-1])
+
+        for cand in candidates_7:
+            res_cand = self.validate(cand)
+            if res_cand.is_valid:
+                return ValidationResult(
+                    is_valid=True,
+                    pattern=res_cand.pattern,
+                    normalized_plate=res_cand.normalized_plate,
+                    raw_text=raw_text,
+                    error_message=None,
+                )
+            corrected = self._apply_positional_correction_7(cand)
+            if corrected:
+                res_corr = self.validate(corrected)
+                if res_corr.is_valid:
+                    return ValidationResult(
+                        is_valid=True,
+                        pattern=res_corr.pattern,
+                        normalized_plate=res_corr.normalized_plate,
+                        raw_text=raw_text,
+                        error_message=None,
+                    )
+
+        return direct
 

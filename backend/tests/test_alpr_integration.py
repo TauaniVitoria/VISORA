@@ -177,8 +177,10 @@ def test_alpr_process_video_endpoint(
     assert data["total_frames_processed"] == 4
     assert data["processing_time_seconds"] > 0
     assert data["average_fps"] > 0
-    assert "passages" in data
-    assert "movements_registered" in data
+    assert data["confirmed_passages_count"] >= 1
+    assert data["movements_registered"] >= 1
+    assert data["passages"][0]["plate"] == "BRA2E19"
+    assert data["passages"][0]["status_movimentacao"] == "aberta"
 
 
 def test_alpr_upload_video_file(
@@ -206,6 +208,9 @@ def test_alpr_upload_video_file(
     result = res.json()
     assert result["total_frames_processed"] == 3
     assert result["processing_time_seconds"] > 0
+    assert result["confirmed_passages_count"] >= 1
+    assert result["movements_registered"] >= 1
+    assert result["passages"][0]["plate"] == "BRA2E19"
 
 
 def test_alpr_pipeline_singleton_reuse_and_security(

@@ -119,3 +119,32 @@ class ImagePreprocessor:
             target_size=(self.target_width, self.target_height),
         )
 
+    def generate_diagnostic_variants(self, image: np.ndarray) -> dict[str, np.ndarray]:
+        """
+        Gera variantes intermediárias do recorte da placa para comparação visual e diagnóstico:
+        original, escala de cinza, CLAHE, sharpening (unsharp mask) e binarização adaptativa.
+        """
+        if image is None or image.size == 0:
+            return {}
+
+        orig = image.copy()
+        resized_bgr = cv2.resize(
+            orig,
+            (self.target_width, self.target_height),
+            interpolation=cv2.INTER_CUBIC if (orig.shape[1] < self.target_width) else cv2.INTER_AREA,
+        )
+        gray = cv2.cvtColor(resized_bgr, cv2.COLOR_BGR2GRAY) if len(resized_bgr.shape) == 3 else resized_bgr.copy()
+        clahe_img = self._clahe.apply(gray)
+        blurred = cv2.GaussianBlur(clahe_img, (0, 0), 1.2)
+        sharpened = cv2.addWeighted(clahe_img, 1.5, blurred, -0.5, 0)
+        adaptive_bin = cv2.adaptiveThreshold(
+            clahe_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
+        )
+        return {
+            "original": orig,
+            "grayscale": gray,
+            "clahe": clahe_img,
+            "sharpened": sharpened,
+            "adaptive_binary": adaptive_bin,
+        }
+
