@@ -1,0 +1,14 @@
+{
+  "metrics": {
+    "video_path": "/Users/tvitoriaferreira/Documents/alpr_project/backend/computer-vision/data/input/uploads/b5eb6839-c6d2-4a98-ab96-9292e6c388a5_16612931_1920_1080_60fps.mp4",
+    "total_frames_processed": 1102,
+    "processing_time_seconds": 36.886,
+    "average_fps": 29.88,
+    "vehicles_detected_count": 1525,
+    "plates_detected_count": 0,
+    "valid_plates_count": 0,
+    "invalid_plates_count": 0,
+    "confirmed_passages_count": 0
+  },
+  "events": []
+}

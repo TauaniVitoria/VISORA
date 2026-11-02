@@ -1338,7 +1338,7 @@ export class CustomersComponent implements OnInit {
       tipo_documento: 'CPF',
       email: '',
       telefone: '',
-      plano_tipo: '',
+      plano_tipo: 'diario',
     };
     this.initialVehicle = {
       placa: '',

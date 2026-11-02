@@ -22,7 +22,7 @@ import { Plano, Tarifa } from '../../core/models/models';
       <div class="notification-banner error" *ngIf="errorMessage">{{ errorMessage }}</div>
 
       <div class="grid-layout">
-        <!-- Coluna 1: Tarifa Avulsa Vigente -->
+        <!-- Tarifa Avulsa Vigente -->
         <div class="card">
           <div class="card-header">
             <h3>Tarifação Avulsa (Horária / Diária)</h3>
@@ -60,67 +60,6 @@ import { Plano, Tarifa } from '../../core/models/models';
             <button type="submit" class="btn-primary">Atualizar Tarifa Vigente</button>
           </form>
         </div>
-
-        <!-- Coluna 2: Planos de Assinatura -->
-        <div class="card">
-          <div class="card-header">
-            <h3>Planos Diários</h3>
-            <button class="btn-subtle" (click)="showNewPlanForm = !showNewPlanForm">
-              {{ showNewPlanForm ? 'Cancelar' : '+ Novo Plano' }}
-            </button>
-          </div>
-
-          <!-- Formulário de Novo Plano -->
-          <div class="new-plan-box" *ngIf="showNewPlanForm">
-            <form (ngSubmit)="savePlan()">
-              <div class="form-row">
-                <div class="form-group flex-2">
-                  <label>Nome do Plano</label>
-                  <input type="text" [(ngModel)]="newPlan.nome" name="p_nome" placeholder="Ex: Diário Corporativo" required class="form-control" />
-                </div>
-                <div class="form-group flex-1">
-                  <label>Recorrência</label>
-                  <select [(ngModel)]="newPlan.tipo_recorrencia" name="p_rec" class="form-control">
-                    <option value="diario">Diário</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group flex-1">
-                  <label>Valor Base (R$)</label>
-                  <input type="number" step="1.0" [(ngModel)]="newPlan.valor_base" name="p_val" required class="form-control" />
-                </div>
-                <div class="form-group flex-1">
-                  <label>Limite Veículos</label>
-                  <input type="number" [(ngModel)]="newPlan.limite_veiculos" name="p_lim" required class="form-control" />
-                </div>
-                <div class="form-group flex-1">
-                  <label>Veículo Adic. (R$)</label>
-                  <input type="number" step="1.0" [(ngModel)]="newPlan.valor_veiculo_adicional" name="p_add" required class="form-control" />
-                </div>
-              </div>
-              <button type="submit" class="btn-primary small">Cadastrar Plano</button>
-            </form>
-          </div>
-
-          <!-- Lista de Planos Ativos -->
-          <div class="plans-list">
-            <div class="plan-card" *ngFor="let p of plans">
-              <div class="plan-badge" [ngClass]="p.tipo_recorrencia">
-                {{ p.tipo_recorrencia.toUpperCase() }}
-              </div>
-              <div class="plan-title">{{ p.nome }}</div>
-              <div class="plan-price">R$ {{ p.valor_base | number:'1.2-2' }}</div>
-              <div class="plan-details">
-                <span>Até {{ p.limite_veiculos }} veículo(s)</span>
-                <span *ngIf="p.valor_veiculo_adicional > 0">+ R$ {{ p.valor_veiculo_adicional | number:'1.2-2' }}/veículo extra</span>
-              </div>
-            </div>
-            <div class="empty-state" *ngIf="plans.length === 0">
-              Nenhum plano cadastrado.
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   `,
@@ -131,10 +70,10 @@ import { Plano, Tarifa } from '../../core/models/models';
     .subtitle { margin: 0.25rem 0 0; color: #64748b; font-size: 0.875rem; }
     .grid-layout {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
+      max-width: 680px;
       gap: 1.5rem;
     }
-    @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
     .card {
       background: #ffffff;
       border: 1px solid #e2e8f0;
