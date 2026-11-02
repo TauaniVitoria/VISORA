@@ -130,6 +130,12 @@ class VehicleTracker:
         # Histórico de emissões de placas para cooldown: placa -> último_timestamp_emissao
         self._plate_cooldown_history: Dict[str, float] = {}
 
+    def reset(self) -> None:
+        """Reinicia o estado interno do rastreador para reuso entre vídeos."""
+        self._next_track_id = 1
+        self.tracks.clear()
+        self._plate_cooldown_history.clear()
+
     @staticmethod
     def compute_iou(box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]) -> float:
         """Calcula a Intersection over Union (IoU) entre duas caixas."""

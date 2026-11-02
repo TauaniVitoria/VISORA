@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
-import { Plano, Tarifa } from '../../core/models/models';
 
 @Component({
   selector: 'app-tariffs-plans',
@@ -96,19 +95,8 @@ import { Plano, Tarifa } from '../../core/models/models';
       padding: 0.25rem 0.6rem;
       border-radius: 999px;
     }
-    .btn-subtle {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: #0284c7;
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
     .form-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
     .flex-1 { flex: 1; }
-    .flex-2 { flex: 2; }
     .form-group label {
       display: block; font-size: 0.75rem; font-weight: 600; color: #475569; margin-bottom: 0.3rem;
     }
@@ -121,29 +109,12 @@ import { Plano, Tarifa } from '../../core/models/models';
       background: #0284c7; color: white; border: none; padding: 0.65rem 1.25rem;
       border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 0.5rem;
     }
-    .btn-primary.small { width: auto; margin-top: 0; }
     .btn-primary:hover { background: #0369a1; }
-    .new-plan-box {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;
-    }
-    .plans-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .plan-card {
-      border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem;
-      display: flex; justify-content: space-between; align-items: center; background: #fafafa;
-    }
-    .plan-badge {
-      font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px;
-    }
-    .plan-badge.diario { background: #fef3c7; color: #b45309; }
-    .plan-title { font-weight: 600; color: #1e293b; font-size: 0.95rem; }
-    .plan-price { font-size: 1.15rem; font-weight: 700; color: #0284c7; }
-    .plan-details { font-size: 0.75rem; color: #64748b; display: flex; flex-direction: column; text-align: right; }
     .notification-banner {
       padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem;
     }
     .notification-banner.success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
     .notification-banner.error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-    .empty-state { padding: 2rem; text-align: center; color: #94a3b8; font-size: 0.85rem; }
   `],
 })
 export class TariffsPlansComponent implements OnInit {
@@ -155,16 +126,6 @@ export class TariffsPlansComponent implements OnInit {
     valor_hora_adicional: 5.0,
     valor_diaria: 50.0,
     tolerancia_minutos: 15,
-  };
-
-  plans: Plano[] = [];
-  showNewPlanForm = false;
-  newPlan = {
-    nome: '',
-    tipo_recorrencia: 'diario',
-    valor_base: 50.0,
-    limite_veiculos: 1,
-    valor_veiculo_adicional: 20.0,
   };
 
   successMessage = '';
@@ -189,11 +150,6 @@ export class TariffsPlansComponent implements OnInit {
       },
       error: () => {},
     });
-
-    this.api.getPlans().subscribe({
-      next: (p) => (this.plans = p),
-      error: () => {},
-    });
   }
 
   saveTariff(): void {
@@ -205,23 +161,6 @@ export class TariffsPlansComponent implements OnInit {
       },
       error: (err) => {
         this.errorMessage = err.error?.detail || 'Erro ao atualizar tarifa.';
-      },
-    });
-  }
-
-  savePlan(): void {
-    if (!this.newPlan.nome) return;
-    this.clearMessages();
-
-    this.api.createPlan(this.newPlan).subscribe({
-      next: () => {
-        this.successMessage = `Plano ${this.newPlan.nome} criado com sucesso!`;
-        this.showNewPlanForm = false;
-        this.newPlan.nome = '';
-        this.loadData();
-      },
-      error: (err) => {
-        this.errorMessage = err.error?.detail || 'Erro ao criar plano.';
       },
     });
   }

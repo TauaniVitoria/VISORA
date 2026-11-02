@@ -150,6 +150,11 @@ class ALPRPipeline:
             bbox_thickness=vis_cfg.get("bbox_thickness", 2),
         )
 
+    def reset(self) -> None:
+        """Reinicia o estado temporal do rastreador mantendo os modelos carregados em memória."""
+        if hasattr(self, "tracker") and self.tracker is not None:
+            self.tracker.reset()
+
     def process_video(
         self,
         video_path: str | Path,
@@ -169,6 +174,7 @@ class ALPRPipeline:
         Returns:
             Tupla contendo (eventos_confirmados, metricas_de_execucao).
         """
+        self.reset()
         v_path = Path(video_path).resolve()
         out_dir = Path(output_dir or self.config.get("video", {}).get("output_dir", "data/output")).resolve()
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -201,7 +207,7 @@ class ALPRPipeline:
             try:
                 for v_frame in reader.read_frames(max_frames=max_frames):
                     frames_processed += 1
-                    frame_img = v_frame.image.copy()
+                    frame_img = v_frame.image.copy() if video_writer is not None else None
 
                     # 1. Detecção de Veículos
                     vehicle_dets = self.vehicle_detector.detect(v_frame.image)
@@ -264,24 +270,26 @@ class ALPRPipeline:
                                 )
                             )
 
-                            # Desenhar placa no visualizador
-                            label = f"{val_res.normalized_plate}" if val_res.normalized_plate else "PLACA"
+                            # Desenhar placa no visualizador apenas quando gerar vídeo anotado
+                            if frame_img is not None:
+                                label = f"{val_res.normalized_plate}" if val_res.normalized_plate else "PLACA"
+                                self.visualizer.draw_bbox_with_label(
+                                    image=frame_img,
+                                    bbox=p_det.bbox,
+                                    label=label,
+                                    color=self.visualizer.plate_box_color,
+                                    confidence=rec_res.confidence if rec_res.confidence > 0 else p_det.confidence,
+                                )
+
+                        # Desenhar veículo apenas quando gerar vídeo anotado
+                        if frame_img is not None:
                             self.visualizer.draw_bbox_with_label(
                                 image=frame_img,
-                                bbox=p_det.bbox,
-                                label=label,
-                                color=self.visualizer.plate_box_color,
-                                confidence=rec_res.confidence if rec_res.confidence > 0 else p_det.confidence,
+                                bbox=v_det.bbox,
+                                label=v_det.class_name.upper(),
+                                color=self.visualizer.vehicle_box_color,
+                                confidence=v_det.confidence,
                             )
-
-                        # Desenhar veículo
-                        self.visualizer.draw_bbox_with_label(
-                            image=frame_img,
-                            bbox=v_det.bbox,
-                            label=v_det.class_name.upper(),
-                            color=self.visualizer.vehicle_box_color,
-                            confidence=v_det.confidence,
-                        )
 
                     # 6. Rastreamento e Prevenção de Duplicidades
                     new_events = self.tracker.update(
@@ -293,17 +301,16 @@ class ALPRPipeline:
                     confirmed_passages.extend(new_events)
 
                     # 7. Telemetria e escrita do quadro
-                    elapsed = time.time() - start_time
-                    current_fps = (frames_processed / elapsed) if elapsed > 0 else 0.0
-                    self.visualizer.draw_telemetry(
-                        image=frame_img,
-                        frame_idx=v_frame.frame_idx,
-                        fps=current_fps,
-                        active_tracks=len(self.tracker.tracks),
-                        confirmed_plates=len(confirmed_passages),
-                    )
-
-                    if video_writer is not None:
+                    if video_writer is not None and frame_img is not None:
+                        elapsed = time.time() - start_time
+                        current_fps = (frames_processed / elapsed) if elapsed > 0 else 0.0
+                        self.visualizer.draw_telemetry(
+                            image=frame_img,
+                            frame_idx=v_frame.frame_idx,
+                            fps=current_fps,
+                            active_tracks=len(self.tracker.tracks),
+                            confirmed_plates=len(confirmed_passages),
+                        )
                         video_writer.write_frame(frame_img)
 
             finally:

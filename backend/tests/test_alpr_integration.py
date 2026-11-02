@@ -207,3 +207,35 @@ def test_alpr_upload_video_file(
     assert result["total_frames_processed"] == 3
     assert result["processing_time_seconds"] > 0
 
+
+def test_alpr_pipeline_singleton_reuse_and_security(
+    client: TestClient,
+    tenant_a_token: str,
+):
+    """Garante reuso singleton do ALPRPipeline em memória e proteção contra path traversal / extensões inválidas."""
+    from app.services.alpr_service import ALPRService
+
+    p1 = ALPRService.get_pipeline()
+    p2 = ALPRService.get_pipeline()
+    assert p1 is p2
+
+    headers = {"Authorization": f"Bearer {tenant_a_token}"}
+
+    # Rejeita path traversal em video_path
+    res_traversal = client.post(
+        "/api/v1/alpr/process-video",
+        headers=headers,
+        data={"video_path": "../../etc/passwd"},
+    )
+    assert res_traversal.status_code == 400
+
+    # Rejeita extensão inválida no upload
+    files = {"video_file": ("malicious.exe", b"not-a-video", "application/octet-stream")}
+    res_ext = client.post(
+        "/api/v1/alpr/process-video",
+        headers=headers,
+        files=files,
+    )
+    assert res_ext.status_code == 400
+
+

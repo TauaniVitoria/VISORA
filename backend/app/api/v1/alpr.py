@@ -26,6 +26,9 @@ router = APIRouter(
 )
 
 
+ALLOWED_VIDEO_EXTENSIONS = {".mp4", ".avi", ".mov", ".mkv", ".webm"}
+
+
 @router.post("/process-video", response_model=ALPRProcessVideoResponse)
 async def process_video(
     video_file: Optional[UploadFile] = File(None),
@@ -46,15 +49,32 @@ async def process_video(
     target_path: Path
 
     if video_file is not None and video_file.filename:
+        safe_filename = Path(video_file.filename).name
+        ext = Path(safe_filename).suffix.lower()
+        if ext not in ALLOWED_VIDEO_EXTENSIONS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Formato de arquivo não permitido ({ext}). Use: {', '.join(sorted(ALLOWED_VIDEO_EXTENSIONS))}.",
+            )
         upload_dir = Path("computer-vision/data/input/uploads")
         upload_dir.mkdir(parents=True, exist_ok=True)
-        unique_name = f"{uuid.uuid4()}_{video_file.filename}"
+        unique_name = f"{uuid.uuid4()}_{safe_filename}"
         target_path = upload_dir / unique_name
 
         with open(target_path, "wb") as buffer:
             shutil.copyfileobj(video_file.file, buffer)
     elif video_path:
+        if ".." in Path(video_path).parts:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Caminho de vídeo inválido (path traversal não permitido).",
+            )
         target_path = Path(video_path)
+        if target_path.suffix.lower() not in ALLOWED_VIDEO_EXTENSIONS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Extensão de vídeo inválida ({target_path.suffix}).",
+            )
     else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -1,67 +1,74 @@
 import { Routes } from '@angular/router';
 import { clienteGuard, staffGuard } from './core/guards/auth.guard';
-import { LoginComponent } from './features/auth/login/login.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { CustomersComponent } from './features/customers/customers.component';
-import { TariffsPlansComponent } from './features/tariffs-plans/tariffs-plans.component';
-import { MovementsComponent } from './features/movements/movements.component';
-import { BillingComponent } from './features/billing/billing.component';
-import { AuditComponent } from './features/audit/audit.component';
-import { AlprComponent } from './features/alpr/alpr.component';
-import { PortalComponent } from './features/portal/portal.component';
-import { PasswordRecoveryComponent } from './features/auth/password-recovery/password-recovery.component';
 
 export const routes: Routes = [
   {
     path: 'login',
-    component: LoginComponent,
+    loadComponent: () =>
+      import('./features/auth/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'forgot-password',
-    component: PasswordRecoveryComponent,
+    loadComponent: () =>
+      import('./features/auth/password-recovery/password-recovery.component').then(
+        (m) => m.PasswordRecoveryComponent
+      ),
   },
   {
     path: 'reset-password',
-    component: PasswordRecoveryComponent,
+    loadComponent: () =>
+      import('./features/auth/password-recovery/password-recovery.component').then(
+        (m) => m.PasswordRecoveryComponent
+      ),
   },
   {
     path: 'portal',
-    component: PortalComponent,
+    loadComponent: () =>
+      import('./features/portal/portal.component').then((m) => m.PortalComponent),
     canActivate: [clienteGuard],
   },
   {
     path: 'dashboard',
-    component: DashboardComponent,
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
     canActivate: [staffGuard],
   },
   {
     path: 'alpr',
-    component: AlprComponent,
+    loadComponent: () =>
+      import('./features/alpr/alpr.component').then((m) => m.AlprComponent),
     canActivate: [staffGuard],
   },
   {
     path: 'customers',
-    component: CustomersComponent,
+    loadComponent: () =>
+      import('./features/customers/customers.component').then((m) => m.CustomersComponent),
     canActivate: [staffGuard],
   },
   {
     path: 'tariffs-plans',
-    component: TariffsPlansComponent,
+    loadComponent: () =>
+      import('./features/tariffs-plans/tariffs-plans.component').then(
+        (m) => m.TariffsPlansComponent
+      ),
     canActivate: [staffGuard],
   },
   {
     path: 'history',
-    component: MovementsComponent,
+    loadComponent: () =>
+      import('./features/movements/movements.component').then((m) => m.MovementsComponent),
     canActivate: [staffGuard],
   },
   {
     path: 'billing',
-    component: BillingComponent,
+    loadComponent: () =>
+      import('./features/billing/billing.component').then((m) => m.BillingComponent),
     canActivate: [staffGuard],
   },
   {
     path: 'audit',
-    component: AuditComponent,
+    loadComponent: () =>
+      import('./features/audit/audit.component').then((m) => m.AuditComponent),
     canActivate: [staffGuard],
   },
   {

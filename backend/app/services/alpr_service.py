@@ -6,7 +6,8 @@ em movimentações de entrada e saída no banco de dados com auditoria completa.
 
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional, Tuple
+import threading
+from typing import Dict, List, Optional, Tuple
 import uuid
 import logging
 
@@ -32,17 +33,30 @@ logger = logging.getLogger("alpr.service")
 class ALPRService:
     """
     Orquestrador de integração do ALPR com a camada de negócio e persistência multi-tenant.
+    Mantém instância singleton do ALPRPipeline em memória por configuração para evitar
+    recarga repetida dos pesos neurais (YOLO + CRNN) a cada requisição.
     """
 
-    @staticmethod
-    def get_pipeline(config_path: Optional[str | Path] = None) -> ALPRPipeline:
-        """Instancia o pipeline ALPR a partir da configuração central."""
+    _pipeline_cache: Dict[str, ALPRPipeline] = {}
+    _pipeline_lock = threading.Lock()
+
+    @classmethod
+    def get_pipeline(cls, config_path: Optional[str | Path] = None) -> ALPRPipeline:
+        """Retorna instância reutilizável (singleton por config_path) do pipeline ALPR."""
         if config_path is None:
             config_path = Path("computer-vision/config/alpr_config.yaml")
             if not config_path.exists():
                 # Tenta caminho relativo à raiz do projeto
                 config_path = Path(__file__).resolve().parents[3] / "computer-vision" / "config" / "alpr_config.yaml"
-        return ALPRPipeline(config_path=config_path)
+
+        resolved_key = str(Path(config_path).resolve())
+        with cls._pipeline_lock:
+            if resolved_key not in cls._pipeline_cache:
+                logger.info("Inicializando ALPRPipeline em memória (singleton): %s", resolved_key)
+                cls._pipeline_cache[resolved_key] = ALPRPipeline(config_path=config_path)
+            pipeline = cls._pipeline_cache[resolved_key]
+            pipeline.reset()
+            return pipeline
 
     @staticmethod
     def process_video_file(

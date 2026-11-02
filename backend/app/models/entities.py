@@ -13,6 +13,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     Numeric,
     String,
@@ -279,6 +280,11 @@ class Tarifa(Base):
 # 10. Movimentação (Eventos ALPR e Permanência)
 class Movimentacao(Base):
     __tablename__ = "movimentacoes"
+    __table_args__ = (
+        Index("ix_movimentacoes_tenant_status", "estacionamento_id", "status"),
+        Index("ix_movimentacoes_tenant_placa_status", "estacionamento_id", "placa", "status"),
+        Index("ix_movimentacoes_tenant_entrada", "estacionamento_id", "entrada_em"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
     estacionamento_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("estacionamentos.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -308,6 +314,9 @@ class Movimentacao(Base):
 # 11. Cobrança
 class Cobranca(Base):
     __tablename__ = "cobrancas"
+    __table_args__ = (
+        Index("ix_cobrancas_tenant_status", "estacionamento_id", "status"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
     estacionamento_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("estacionamentos.id", ondelete="CASCADE"), nullable=False, index=True)

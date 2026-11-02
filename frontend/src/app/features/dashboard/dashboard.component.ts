@@ -118,7 +118,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let m of activeMovements">
+              <tr *ngFor="let m of activeMovements; trackBy: trackByMovId">
                 <td>
                   <span class="plate-badge">{{ m.placa }}</span>
                 </td>
@@ -423,6 +423,11 @@ export class DashboardComponent implements OnInit {
   exitPlate = '';
   actionSuccess = '';
   actionError = '';
+  submittingEntry = false;
+
+  trackByMovId(_index: number, item: Movimentacao): string {
+    return item.id;
+  }
 
   ngOnInit(): void {
     this.loadData();
@@ -447,6 +452,7 @@ export class DashboardComponent implements OnInit {
   }
 
   onRegisterEntry(rawInput?: string): void {
+    if (this.submittingEntry) return;
     this.clearNotifications();
     const candidate = rawInput ?? this.plateInputRef?.nativeElement?.value ?? this.entryPlate ?? '';
     const cleanPlate = candidate.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -465,8 +471,10 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
+    this.submittingEntry = true;
     this.api.registerEntry({ placa: cleanPlate }).subscribe({
       next: (mov) => {
+        this.submittingEntry = false;
         this.actionSuccess = `Entrada registrada com sucesso para o veículo placa ${mov.placa}!`;
         this.entryPlate = '';
         if (this.plateInputRef?.nativeElement) {
@@ -484,6 +492,7 @@ export class DashboardComponent implements OnInit {
         this.loadData();
       },
       error: (err) => {
+        this.submittingEntry = false;
         this.actionError = this.extractErrorMessage(err, 'Erro ao registrar entrada.');
         this.cdr.detectChanges();
       },

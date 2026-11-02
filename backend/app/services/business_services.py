@@ -404,11 +404,17 @@ class CustomerVehicleService:
 
         mov_stmt = (
             select(Movimentacao)
-            .options(selectinload(Movimentacao.cobranca))
+            .options(
+                selectinload(Movimentacao.cobranca),
+                selectinload(Movimentacao.veiculo).selectinload(Veiculo.cliente),
+            )
             .where(and_(*conds))
             .order_by(Movimentacao.entrada_em.desc())
         )
         movements = list(db.scalars(mov_stmt).all())
+
+        active_tariff: Optional[Tarifa] = None
+        now_utc = utc_now()
 
         results = []
         for m in movements:
@@ -417,17 +423,14 @@ class CustomerVehicleService:
             if m.cobranca:
                 valor = m.cobranca.valor_liquido
             elif esta_estacionado:
-                try:
-                    res_charge = TariffPlanService.calculate_stay_charge(
-                        db=db,
-                        tenant_id=tenant_id,
-                        entrada_em=m.entrada_em,
-                        saida_em=utc_now(),
-                        placa=m.placa,
-                    )
-                    valor = res_charge.get("valor_final")
-                except Exception:
-                    valor = None
+                if m.tipo_cobranca == TipoCobranca.PLANO.value or m.tem_plano:
+                    valor = Decimal("0.00")
+                else:
+                    if active_tariff is None:
+                        active_tariff = TariffPlanService.get_active_tariff(db, tenant_id)
+                    entrada_utc = ensure_utc(m.entrada_em) or now_utc
+                    perm_min = max(0, int((now_utc - entrada_utc).total_seconds() // 60))
+                    valor = TariffPlanService.calculate_tariff_amount(active_tariff, perm_min)
 
             results.append({
                 "id": m.id,
@@ -488,6 +491,21 @@ class TariffPlanService:
             db.commit()
             db.refresh(tarifa)
         return tarifa
+
+    @staticmethod
+    def calculate_tariff_amount(tarifa: Tarifa, permanencia_min: int) -> Decimal:
+        """Calcula o valor devido para permanência avulsa segundo as regras da tarifa ativa."""
+        if permanencia_min <= tarifa.tolerancia_minutos:
+            return Decimal("0.00")
+        if permanencia_min <= 60:
+            return tarifa.valor_primeira_hora
+        if permanencia_min >= 720:  # Acima de 12 horas aplica diária
+            diarias = max(1, math.ceil(permanencia_min / (24 * 60)))
+            return Decimal(str(diarias)) * tarifa.valor_diaria
+
+        horas_adicionais = math.ceil((permanencia_min - 60) / 60)
+        calculado = tarifa.valor_primeira_hora + (Decimal(str(horas_adicionais)) * tarifa.valor_hora_adicional)
+        return min(calculado, tarifa.valor_diaria)
 
     @staticmethod
     def create_plan(db: Session, tenant_id: uuid.UUID, plan_in: PlanoCreate) -> Plano:
@@ -638,24 +656,12 @@ class MovementService:
         valor_devido = Decimal("0.00")
 
         if mov.tipo_cobranca == TipoCobranca.PLANO.value:
-            # Isento na cancela pois já é mensalista
+            # Isento na cancela pois possui plano ativo
             valor_devido = Decimal("0.00")
         else:
             # Cobrança avulsa baseada em tarifa
             tarifa = TariffPlanService.get_active_tariff(db, tenant_id)
-
-            if permanencia_min <= tarifa.tolerancia_minutos:
-                valor_devido = Decimal("0.00")
-            elif permanencia_min <= 60:
-                valor_devido = tarifa.valor_primeira_hora
-            elif permanencia_min >= 720:  # Acima de 12 horas aplica diária
-                diarias = max(1, math.ceil(permanencia_min / (24 * 60)))
-                valor_devido = Decimal(str(diarias)) * tarifa.valor_diaria
-            else:
-                horas_adicionais = math.ceil((permanencia_min - 60) / 60)
-                calculado = tarifa.valor_primeira_hora + (Decimal(str(horas_adicionais)) * tarifa.valor_hora_adicional)
-                # Teto na diária
-                valor_devido = min(calculado, tarifa.valor_diaria)
+            valor_devido = TariffPlanService.calculate_tariff_amount(tarifa, permanencia_min)
 
         # 5. Determina o cliente se o veículo estiver cadastrado
         cliente_id = None
@@ -836,20 +842,27 @@ class DashboardService:
             )
         ) or Decimal("0.00")
 
-        # Cobranças pendentes
-        cobrancas_pendentes = db.scalars(
-            select(Cobranca).where(
+        # Cobranças pendentes (agregação direta em SQL sem carregar objetos em memória)
+        pendentes_row = db.execute(
+            select(
+                func.count(Cobranca.id),
+                func.coalesce(func.sum(Cobranca.valor_liquido), Decimal("0.00")),
+            ).where(
                 Cobranca.estacionamento_id == tenant_id,
                 Cobranca.status == CobrancaStatus.PENDENTE.value,
             )
-        ).all()
+        ).one()
 
-        pendentes_valor = sum((c.valor_liquido for c in cobrancas_pendentes), Decimal("0.00"))
-        pendentes_qtd = len(cobrancas_pendentes)
+        pendentes_qtd = int(pendentes_row[0] or 0)
+        pendentes_valor = Decimal(str(pendentes_row[1] or "0.00"))
 
-        # Movimentações mais recentes (últimas 10)
+        # Movimentações mais recentes (últimas 10 com eager loading para evitar N+1 em tem_plano e cobranca)
         recentes_stmt = (
             select(Movimentacao)
+            .options(
+                selectinload(Movimentacao.cobranca),
+                selectinload(Movimentacao.veiculo).selectinload(Veiculo.cliente),
+            )
             .where(Movimentacao.estacionamento_id == tenant_id)
             .order_by(Movimentacao.entrada_em.desc())
             .limit(10)
