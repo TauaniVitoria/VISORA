@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "Parking SaaS ALPR"
+    PROJECT_NAME: str = "VISORA"
     SECRET_KEY: str = "change-this-to-a-super-secret-key-in-production-min-32-chars"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day
     PASSWORD_RESET_EXPIRE_MINUTES: int = 30
@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
-    SMTP_FROM: str = "no-reply@parkingsaas.local"
+    SMTP_FROM: str = "no-reply@visora.local"
 
     # Database
     POSTGRES_SERVER: str = "localhost"

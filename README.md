@@ -1,6 +1,6 @@
-# Parking SaaS com Reconhecimento Automático de Placas (ALPR)
+# VISORA — Gestão Inteligente de Estacionamentos com ALPR
 
-Plataforma SaaS multi-tenant para gestão automatizada de estacionamentos privados, integrando visão computacional de ponta (YOLOv8 + CRNN + PyTorch), backend REST assíncrono (FastAPI + PostgreSQL) e interface web reativa moderna (Angular 17 SPA com Signals).
+O **VISORA** é uma plataforma SaaS multi-tenant para gestão automatizada de estacionamentos privados, integrando visão computacional de ponta (YOLOv8 + CRNN + PyTorch), backend REST assíncrono (FastAPI + PostgreSQL) e interface web reativa moderna (Angular 17 SPA com Signals).
 
 ---
 

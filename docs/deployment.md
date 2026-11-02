@@ -1,6 +1,6 @@
-# Manual de Implantação e Operação (Deploy & Runbook)
+# Manual de Implantação e Operação (Deploy & Runbook) — VISORA
 
-Este documento descreve os procedimentos completos para executar, testar e implantar a plataforma **Parking SaaS ALPR** em ambientes locais e de produção.
+Este documento descreve os procedimentos completos para executar, testar e implantar a plataforma **VISORA** em ambientes locais e de produção.
 
 ---
 

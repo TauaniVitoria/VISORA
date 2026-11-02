@@ -98,7 +98,7 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="sidebar-footer" *ngIf="!authService.isCliente()">
         <div class="status-indicator">
           <span class="status-dot"></span>
-          <span>ALPR Engine Online</span>
+          <span>VISORA ALPR Online</span>
         </div>
       </div>
     </aside>

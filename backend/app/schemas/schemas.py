@@ -4,9 +4,10 @@ Esquemas Pydantic para validação, serialização de entrada e resposta da API 
 
 from datetime import date, datetime
 from decimal import Decimal
+import re
 from typing import Any, Dict, List, Optional
 import uuid
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from app.models.entities import (
     AssinaturaStatus,
@@ -135,27 +136,86 @@ class VeiculoOut(BaseModel):
 
 
 class ClienteCreate(BaseModel):
+    codigo: Optional[str] = Field(None, max_length=30, description="Código gerado automaticamente se omitido")
     nome: str = Field(..., min_length=2, max_length=120)
-    documento: str = Field(..., min_length=11, max_length=20)
+    documento: str = Field(..., min_length=11, max_length=20, description="CPF do cliente")
     tipo_documento: DocumentoTipo = DocumentoTipo.CPF
-    telefone: Optional[str] = None
+    telefone: str = Field(..., min_length=8, max_length=25, description="Telefone de contato obrigatório")
     email: Optional[EmailStr] = None
-    # Requisito: O cadastro inicial de um cliente deverá incluir pelo menos um veículo
+    plano_tipo: str = Field(..., description="Modalidade do plano: diario, mensal ou anual")
     veiculos_iniciais: List[VeiculoCreate] = Field(..., min_length=1)
+
+    @field_validator("documento")
+    @classmethod
+    def validate_documento(cls, v: str) -> str:
+        v_clean = v.strip()
+        digits = re.sub(r"\D", "", v_clean)
+        if len(digits) not in (11, 14):
+            raise ValueError("O documento deve conter 11 dígitos (CPF) ou 14 dígitos (CNPJ).")
+        if len(set(digits)) == 1:
+            raise ValueError("Documento inválido (dígitos repetidos).")
+        return v_clean
+
+    @field_validator("telefone")
+    @classmethod
+    def validate_telefone(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError("O telefone de contato é obrigatório.")
+        v_clean = v.strip()
+        digits = re.sub(r"\D", "", v_clean)
+        if len(digits) < 8 or len(digits) > 15:
+            raise ValueError("Telefone inválido. Deve conter DDD e número (entre 8 e 15 dígitos numéricos).")
+        return v_clean
+
+    @field_validator("plano_tipo")
+    @classmethod
+    def validate_plano(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError("O plano contratado é obrigatório (diário, mensal ou anual).")
+        norm = v.strip().lower()
+        if norm in ("diario", "diário"):
+            return "diario"
+        if norm == "mensal":
+            return "mensal"
+        if norm == "anual":
+            return "anual"
+        raise ValueError("Plano inválido. As opções permitidas são: diário, mensal ou anual.")
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
 
 
 class ClienteOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: uuid.UUID
+    codigo: str
     estacionamento_id: uuid.UUID
     nome: str
     documento: str
     tipo_documento: str
     telefone: Optional[str] = None
     email: Optional[str] = None
+    plano_tipo: str
     criado_em: datetime
     acesso_portal: bool = False
     veiculos: List[VeiculoOut] = []
+
+
+class ClienteMovimentacaoOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: uuid.UUID
+    placa: str
+    entrada_em: datetime
+    saida_em: Optional[datetime] = None
+    permanencia_minutos: Optional[int] = None
+    status: str
+    tipo_cobranca: Optional[str] = None
+    valor_calculado: Optional[Decimal] = None
+    esta_estacionado: bool = False
 
 
 # --- Planos e Tarifas ---

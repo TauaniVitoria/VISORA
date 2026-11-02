@@ -147,12 +147,14 @@ class Cliente(Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
+    codigo: Mapped[str] = mapped_column(String(30), unique=True, nullable=False, index=True)
     estacionamento_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("estacionamentos.id", ondelete="CASCADE"), nullable=False, index=True)
     nome: Mapped[str] = mapped_column(String(120), nullable=False)
     documento: Mapped[str] = mapped_column(String(20), nullable=False)
     tipo_documento: Mapped[str] = mapped_column(String(10), default=DocumentoTipo.CPF.value, nullable=False)
     telefone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     email: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    plano_tipo: Mapped[str] = mapped_column(String(20), default="mensal", nullable=False)
     criado_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     estacionamento: Mapped["Estacionamento"] = relationship("Estacionamento", back_populates="clientes")

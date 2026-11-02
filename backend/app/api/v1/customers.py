@@ -3,7 +3,8 @@ Endpoints para gerenciamento de clientes e veículos.
 Aplica isolamento multi-tenant por estacionamento_id.
 """
 
-from typing import Any, List
+from datetime import datetime
+from typing import Any, List, Optional
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -11,7 +12,15 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.api.deps import get_current_tenant_id, get_current_user, get_db, require_roles
 from app.models.entities import Cliente, Usuario, UsuarioPerfil
-from app.schemas.schemas import ClienteCreate, ClienteOut, PortalAccessCreate, UsuarioOut, VeiculoCreate, VeiculoOut
+from app.schemas.schemas import (
+    ClienteCreate,
+    ClienteMovimentacaoOut,
+    ClienteOut,
+    PortalAccessCreate,
+    UsuarioOut,
+    VeiculoCreate,
+    VeiculoOut,
+)
 from app.services.business_services import CustomerVehicleService
 from app.services.portal_service import PortalAccessService
 
@@ -126,3 +135,27 @@ def revoke_portal_access(
 ) -> None:
     """Desativa o login do cliente no portal."""
     PortalAccessService.revoke_access(db, tenant_id, client_id, actor_id=current_user.id)
+
+
+@router.get(
+    "/{client_id}/movements",
+    response_model=List[ClienteMovimentacaoOut],
+    dependencies=[Depends(require_roles(UsuarioPerfil.ESTACIONAMENTO_ADMIN, UsuarioPerfil.SAAS_ADMIN))],
+)
+def get_customer_movements(
+    client_id: uuid.UUID,
+    placa: Optional[str] = None,
+    data_inicio: Optional[datetime] = None,
+    data_fim: Optional[datetime] = None,
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: Session = Depends(get_db),
+) -> Any:
+    """Retorna histórico completo de movimentações de todos os veículos vinculados ao cliente."""
+    return CustomerVehicleService.get_customer_movements(
+        db=db,
+        tenant_id=tenant_id,
+        cliente_id=client_id,
+        placa=placa,
+        data_inicio=data_inicio,
+        data_fim=data_fim,
+    )

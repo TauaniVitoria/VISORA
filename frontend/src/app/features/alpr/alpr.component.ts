@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
-import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/models/models';
+import { Camera, ALPRProcessVideoResponse } from '../../core/models/models';
 
 @Component({
   selector: 'app-alpr',
@@ -13,7 +13,7 @@ import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/m
       <header class="page-header">
         <div>
           <h2>Central ALPR — Câmeras & Processamento</h2>
-          <p class="subtitle">Gerenciamento de câmeras, ingestão de vídeo e detecção de placas em tempo real</p>
+          <p class="subtitle">Gerenciamento de câmeras e ingestão de vídeo com pipeline ALPR</p>
         </div>
       </header>
 
@@ -25,9 +25,6 @@ import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/m
       <div class="tab-bar">
         <button class="tab-btn" [class.active]="activeTab === 'cameras'" (click)="activeTab = 'cameras'">
           Câmeras
-        </button>
-        <button class="tab-btn" [class.active]="activeTab === 'detect'" (click)="activeTab = 'detect'">
-          Detecção em Tempo Real
         </button>
         <button class="tab-btn" [class.active]="activeTab === 'video'" (click)="activeTab = 'video'">
           Processar Vídeo
@@ -99,77 +96,6 @@ import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/m
           </div>
           <div *ngIf="cameras.length === 0" class="empty-state">
             Nenhuma câmera cadastrada. Clique em "+ Nova Câmera" para registrar seu primeiro ponto de leitura ALPR.
-          </div>
-        </div>
-      </div>
-
-      <!-- ====== TAB: Detecção em Tempo Real ====== -->
-      <div *ngIf="activeTab === 'detect'" class="tab-content">
-        <div class="section-header">
-          <h3>Simular Detecção de Placa</h3>
-        </div>
-        <p class="description">Simula um evento de detecção de placa como se fosse uma câmera real reportando uma leitura.
-          O sistema determina automaticamente se é entrada ou saída.</p>
-
-        <div class="form-card">
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Placa do Veículo *</label>
-              <input type="text" [(ngModel)]="detectForm.placa" placeholder="ABC1D23" class="input-plate"
-                     maxlength="7" (input)="detectForm.placa = detectForm.placa.toUpperCase()" />
-            </div>
-            <div class="form-group">
-              <label>Câmera Associada</label>
-              <select [(ngModel)]="detectForm.camera_id">
-                <option value="">Nenhuma (automático)</option>
-                <option *ngFor="let cam of cameras" [value]="cam.id">
-                  {{ cam.identificador }} ({{ cam.tipo }})
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Tipo do Evento</label>
-              <select [(ngModel)]="detectForm.tipo_evento">
-                <option value="auto">Automático (detecta pelo estado)</option>
-                <option value="entrada">Forçar Entrada</option>
-                <option value="saida">Forçar Saída</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Confiança OCR</label>
-              <input type="number" [(ngModel)]="detectForm.ocr_confidence" step="0.01" min="0" max="1" />
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="btn-primary btn-detect" (click)="simulateDetection()"
-                    [disabled]="!detectForm.placa || detectForm.placa.length < 7 || loading">
-              {{ loading ? 'Processando...' : 'Executar Detecção ALPR' }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Detection Result -->
-        <div *ngIf="lastDetection" class="result-card">
-          <h4>Resultado da Detecção</h4>
-          <div class="result-grid">
-            <div class="result-item">
-              <span class="result-label">Placa</span>
-              <span class="result-value plate-value">{{ lastDetection.plate }}</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Evento</span>
-              <span class="result-value event-badge" [ngClass]="lastDetection.tipo_evento">
-                {{ lastDetection.tipo_evento | uppercase }}
-              </span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Status Movimentação</span>
-              <span class="result-value">{{ lastDetection.status_movimentacao }}</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Confiança OCR</span>
-              <span class="result-value">{{ (lastDetection.ocr_confidence * 100).toFixed(1) }}%</span>
-            </div>
           </div>
         </div>
       </div>
@@ -415,7 +341,7 @@ import { Camera, ALPRPassageEvent, ALPRProcessVideoResponse } from '../../core/m
 export class AlprComponent implements OnInit {
   private api = inject(ApiService);
 
-  activeTab: 'cameras' | 'detect' | 'video' = 'cameras';
+  activeTab: 'cameras' | 'video' = 'cameras';
   cameras: Camera[] = [];
   loading = false;
   processingVideo = false;
@@ -425,10 +351,6 @@ export class AlprComponent implements OnInit {
   // Camera form
   showCameraForm = false;
   newCamera = { identificador: '', tipo: 'entrada', localizacao: '', rtsp_url: '' };
-
-  // Detection form
-  detectForm = { placa: '', camera_id: '', tipo_evento: 'auto', ocr_confidence: 0.95 };
-  lastDetection: ALPRPassageEvent | null = null;
 
   // Video processing
   selectedVideoFile: File | null = null;
@@ -485,28 +407,6 @@ export class AlprComponent implements OnInit {
         this.loadCameras();
       },
       error: (err: any) => { this.errorMessage = err.error?.detail || 'Erro ao remover câmera.'; }
-    });
-  }
-
-  simulateDetection(): void {
-    this.clearMessages();
-    this.loading = true;
-    this.lastDetection = null;
-    this.api.alprSimulateDetection({
-      placa: this.detectForm.placa,
-      camera_id: this.detectForm.camera_id || undefined,
-      tipo_evento: this.detectForm.tipo_evento,
-      ocr_confidence: this.detectForm.ocr_confidence,
-    }).subscribe({
-      next: (res: ALPRPassageEvent) => {
-        this.loading = false;
-        this.lastDetection = res;
-        this.successMessage = `Detecção processada: ${res.plate} → ${res.tipo_evento.toUpperCase()}`;
-      },
-      error: (err: any) => {
-        this.loading = false;
-        this.errorMessage = err.error?.detail || 'Erro ao processar detecção ALPR.';
-      }
     });
   }
 

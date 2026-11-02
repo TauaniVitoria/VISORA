@@ -14,6 +14,8 @@ def test_subscription_requires_vehicle_owned_by_customer(client: TestClient, ten
         "nome": "Cliente Alpha",
         "documento": "11100022233",
         "tipo_documento": "CPF",
+        "telefone": "(11) 98888-0001",
+        "plano_tipo": "mensal",
         "veiculos_iniciais": [{"placa": "ALP1A01", "tipo": "carro"}],
     }).json()
 
@@ -22,6 +24,8 @@ def test_subscription_requires_vehicle_owned_by_customer(client: TestClient, ten
         "nome": "Cliente Beta",
         "documento": "22200033344",
         "tipo_documento": "CPF",
+        "telefone": "(11) 98888-0002",
+        "plano_tipo": "anual",
         "veiculos_iniciais": [{"placa": "BET2B02", "tipo": "carro"}],
     }).json()
 

@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import uuid
 from fastapi import HTTPException, status
 from sqlalchemy import and_, func, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from jose import JWTError
 
@@ -280,14 +280,27 @@ class CustomerVehicleService:
                     detail=f"A placa {norm_plate} já está cadastrada e ativa neste estacionamento.",
                 )
 
+        # Geração automática de código único permanente
+        codigo = customer_in.codigo
+        if not codigo:
+            total_clientes = db.scalar(select(func.count()).select_from(Cliente)) or 0
+            seq = total_clientes + 1
+            candidate = f"CLI-{seq:04d}"
+            while db.scalar(select(Cliente.id).where(Cliente.codigo == candidate)):
+                seq += 1
+                candidate = f"CLI-{seq:04d}"
+            codigo = candidate
+
         # Criação do cliente
         cliente = Cliente(
+            codigo=codigo,
             estacionamento_id=tenant_id,
-            nome=customer_in.nome,
+            nome=customer_in.nome.strip(),
             documento=customer_in.documento.strip(),
-            tipo_documento=customer_in.tipo_documento.value,
-            telefone=customer_in.telefone,
-            email=customer_in.email,
+            tipo_documento=customer_in.tipo_documento.value if hasattr(customer_in.tipo_documento, "value") else str(customer_in.tipo_documento),
+            telefone=customer_in.telefone.strip() if customer_in.telefone else None,
+            email=str(customer_in.email).strip().lower() if customer_in.email else None,
+            plano_tipo=customer_in.plano_tipo.strip().lower(),
         )
         db.add(cliente)
         db.flush()
@@ -350,6 +363,84 @@ class CustomerVehicleService:
         db.commit()
         db.refresh(veiculo)
         return veiculo
+
+    @staticmethod
+    def get_customer_movements(
+        db: Session,
+        tenant_id: uuid.UUID,
+        cliente_id: uuid.UUID,
+        placa: Optional[str] = None,
+        data_inicio: Optional[datetime] = None,
+        data_fim: Optional[datetime] = None,
+    ) -> List[Dict[str, Any]]:
+        client_stmt = select(Cliente).where(Cliente.id == cliente_id, Cliente.estacionamento_id == tenant_id)
+        cliente = db.scalar(client_stmt)
+        if not cliente:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cliente não encontrado.")
+
+        # Veículos do cliente
+        veiculos_stmt = select(Veiculo).where(Veiculo.cliente_id == cliente_id, Veiculo.estacionamento_id == tenant_id)
+        veiculos = list(db.scalars(veiculos_stmt).all())
+        v_ids = [v.id for v in veiculos]
+        v_placas = [v.placa for v in veiculos]
+
+        if not v_ids and not v_placas:
+            return []
+
+        conds = [
+            Movimentacao.estacionamento_id == tenant_id,
+            or_(Movimentacao.veiculo_id.in_(v_ids), Movimentacao.placa.in_(v_placas)),
+        ]
+
+        if placa and placa.strip():
+            norm_p = placa.strip().upper().replace("-", "")
+            conds.append(Movimentacao.placa == norm_p)
+
+        if data_inicio:
+            conds.append(Movimentacao.entrada_em >= data_inicio)
+
+        if data_fim:
+            conds.append(Movimentacao.entrada_em <= data_fim)
+
+        mov_stmt = (
+            select(Movimentacao)
+            .options(selectinload(Movimentacao.cobranca))
+            .where(and_(*conds))
+            .order_by(Movimentacao.entrada_em.desc())
+        )
+        movements = list(db.scalars(mov_stmt).all())
+
+        results = []
+        for m in movements:
+            esta_estacionado = (m.saida_em is None and m.status in (MovimentacaoStatus.ABERTA.value, MovimentacaoStatus.INCONSISTENTE.value))
+            valor = None
+            if m.cobranca:
+                valor = m.cobranca.valor_liquido
+            elif esta_estacionado:
+                try:
+                    res_charge = TariffPlanService.calculate_stay_charge(
+                        db=db,
+                        tenant_id=tenant_id,
+                        entrada_em=m.entrada_em,
+                        saida_em=utc_now(),
+                        placa=m.placa,
+                    )
+                    valor = res_charge.get("valor_final")
+                except Exception:
+                    valor = None
+
+            results.append({
+                "id": m.id,
+                "placa": m.placa,
+                "entrada_em": m.entrada_em,
+                "saida_em": m.saida_em,
+                "permanencia_minutos": m.permanencia_minutos,
+                "status": m.status,
+                "tipo_cobranca": m.tipo_cobranca,
+                "valor_calculado": valor,
+                "esta_estacionado": esta_estacionado,
+            })
+        return results
 
 
 class TariffPlanService:

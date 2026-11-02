@@ -17,8 +17,8 @@ import { AuthService } from '../../core/services/auth.service';
           </svg>
         </div>
         <div class="brand-text">
-          <span class="brand-title">Parking SaaS</span>
-          <span class="brand-subtitle">ALPR Intelligent Platform</span>
+          <span class="brand-title">VISORA</span>
+          <span class="brand-subtitle">Inteligência em Estacionamentos</span>
         </div>
       </div>
 

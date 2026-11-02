@@ -7,6 +7,7 @@ import {
   AuditoriaLog,
   Camera,
   Cliente,
+  ClienteMovimentacao,
   Cobranca,
   DashboardMetrics,
   Estacionamento,
@@ -40,14 +41,27 @@ export class ApiService {
   }
 
   createCustomer(data: {
+    codigo?: string;
     nome: string;
     documento: string;
     tipo_documento: string;
-    telefone?: string;
+    telefone: string;
     email?: string;
+    plano_tipo: string;
     veiculos_iniciais: { placa: string; marca?: string; modelo?: string; cor?: string; tipo: string }[];
   }): Observable<Cliente> {
     return this.http.post<Cliente>(`${this.baseUrl}/customers/`, data);
+  }
+
+  getCustomerMovements(
+    clientId: string,
+    params?: { placa?: string; data_inicio?: string; data_fim?: string }
+  ): Observable<ClienteMovimentacao[]> {
+    let httpParams = new HttpParams();
+    if (params?.placa) httpParams = httpParams.set('placa', params.placa);
+    if (params?.data_inicio) httpParams = httpParams.set('data_inicio', params.data_inicio);
+    if (params?.data_fim) httpParams = httpParams.set('data_fim', params.data_fim);
+    return this.http.get<ClienteMovimentacao[]>(`${this.baseUrl}/customers/${clientId}/movements`, { params: httpParams });
   }
 
   addVehicle(clientId: string, data: { placa: string; marca?: string; modelo?: string; cor?: string; tipo: string }): Observable<Veiculo> {

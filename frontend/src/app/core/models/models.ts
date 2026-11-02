@@ -50,15 +50,29 @@ export interface Veiculo {
 
 export interface Cliente {
   id: string;
+  codigo: string;
   estacionamento_id: string;
   nome: string;
   documento: string;
   tipo_documento: 'CPF' | 'CNPJ';
-  telefone?: string;
+  telefone: string;
   email?: string;
+  plano_tipo: 'diario' | 'mensal' | 'anual' | string;
   criado_em: string;
   acesso_portal?: boolean;
   veiculos: Veiculo[];
+}
+
+export interface ClienteMovimentacao {
+  id: string;
+  placa: string;
+  entrada_em: string;
+  saida_em?: string;
+  permanencia_minutos?: number;
+  status: string;
+  tipo_cobranca?: string;
+  valor_calculado?: number;
+  esta_estacionado: boolean;
 }
 
 export interface Tarifa {

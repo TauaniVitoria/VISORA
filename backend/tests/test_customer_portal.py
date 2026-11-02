@@ -29,6 +29,8 @@ def make_customer(client: TestClient, headers: Dict[str, str], nome: str, docume
             "nome": nome,
             "documento": documento,
             "tipo_documento": "CPF",
+            "telefone": "(11) 98888-0000",
+            "plano_tipo": "mensal",
             "email": f"contato.{placa.lower()}@mail.com",
             "veiculos_iniciais": [{"placa": placa, "marca": "Fiat", "modelo": "Uno", "cor": "Prata", "tipo": "carro"}],
         },
