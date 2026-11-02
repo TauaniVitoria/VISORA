@@ -1,7 +1,7 @@
 """
 Script para popular o banco de dados com dados de demonstração:
 - Clientes com códigos sequenciais CLI-0001 a CLI-0020
-- Planos diversificados (diário, mensal, anual)
+- Planos diversificados (diário e mensal)
 - Múltiplos veículos por cliente (carros, motos, caminhões, ônibus)
 - Movimentações reais (entradas, saídas, permanências, cobranças e veículos atualmente estacionados)
 
@@ -118,7 +118,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "mariana.santos@email.com",
                 "telefone": "(11) 97654-3210",
-                "plano_tipo": "anual",
+                "plano_tipo": "mensal",
                 "veiculos": [
                     {"placa": "ABC1234", "marca": "Honda", "modelo": "Civic Touring", "cor": "Preto", "tipo": "carro"},
                 ],
@@ -179,7 +179,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "alexandre.souza@email.com",
                 "telefone": "(11) 92109-8765",
-                "plano_tipo": "anual",
+                "plano_tipo": "mensal",
                 "veiculos": [
                     {"placa": "BRA3A20", "marca": "Fiat", "modelo": "Pulse Audace", "cor": "Azul", "tipo": "carro"},
                 ],
@@ -216,7 +216,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "camila.duarte@email.com",
                 "telefone": "(11) 99876-5432",
-                "plano_tipo": "anual",
+                "plano_tipo": "mensal",
                 "veiculos": [
                     {"placa": "DFG7890", "marca": "BMW", "modelo": "320i M Sport", "cor": "Preto", "tipo": "carro"},
                 ],
@@ -242,7 +242,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "patricia.mendes@email.com",
                 "telefone": "(11) 98222-3344",
-                "plano_tipo": "anual",
+                "plano_tipo": "mensal",
                 "veiculos": [
                     {"placa": "RIO9B99", "marca": "Volkswagen", "modelo": "T-Cross Highline", "cor": "Branco", "tipo": "carro"},
                 ],
@@ -279,7 +279,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "bruno.silveira@email.com",
                 "telefone": "(11) 98555-6677",
-                "plano_tipo": "anual",
+                "plano_tipo": "mensal",
                 "veiculos": [
                     {"placa": "SPX4D56", "marca": "Ford", "modelo": "Territory Titanium", "cor": "Preto", "tipo": "carro"},
                 ],
@@ -316,7 +316,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "priscila.faria@email.com",
                 "telefone": "(11) 98888-9900",
-                "plano_tipo": "anual",
+                "plano_tipo": "mensal",
                 "veiculos": [
                     {"placa": "ONB2F34", "marca": "Volvo", "modelo": "Marcopolo G7", "cor": "Prata", "tipo": "onibus"},
                 ],
@@ -542,7 +542,7 @@ def seed_data() -> None:
                     saida_em=saida_em,
                     permanencia_minutos=permanencia,
                     status=status,
-                    tipo_cobranca=TipoCobranca.PLANO.value if cliente.plano_tipo in ("mensal", "anual") else TipoCobranca.AVULSA.value,
+                    tipo_cobranca=TipoCobranca.PLANO.value if cliente.plano_tipo == "mensal" else TipoCobranca.AVULSA.value,
                     observacao=f"Entrada registrada via ALPR para {cliente.nome}",
                 )
                 db.add(mov)

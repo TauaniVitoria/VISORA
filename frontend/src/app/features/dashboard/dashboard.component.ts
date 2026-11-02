@@ -275,7 +275,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       border-color: #0284c7;
     }
     .btn-action-in {
-      background: #16a34a;
+      background: #0284c7;
       color: white;
       border: none;
       padding: 0 1.25rem;
@@ -283,7 +283,8 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       font-weight: 600;
       cursor: pointer;
     }
-    .btn-action-in:hover { background: #15803d; }
+    .btn-action-in:hover:not(:disabled) { background: #0369a1; }
+    .btn-action-in:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-action-out {
       background: #dc2626;
       color: white;
@@ -381,9 +382,9 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       border-radius: 4px;
     }
     .btn-table-action {
-      background: #fee2e2;
-      color: #dc2626;
-      border: 1px solid #fca5a5;
+      background: #ffffff;
+      color: #0284c7;
+      border: 1px solid #0284c7;
       padding: 0.35rem 0.75rem;
       border-radius: 6px;
       font-weight: 600;
@@ -391,7 +392,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       cursor: pointer;
     }
     .btn-table-action:hover {
-      background: #fecaca;
+      background: #e0f2fe;
     }
     .empty-state {
       padding: 2rem;

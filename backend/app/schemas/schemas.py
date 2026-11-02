@@ -142,7 +142,7 @@ class ClienteCreate(BaseModel):
     tipo_documento: DocumentoTipo = DocumentoTipo.CPF
     telefone: str = Field(..., min_length=8, max_length=25, description="Telefone de contato obrigatório")
     email: Optional[EmailStr] = None
-    plano_tipo: str = Field(..., description="Modalidade do plano: diario, mensal ou anual")
+    plano_tipo: str = Field(..., description="Modalidade do plano: diario ou mensal")
     veiculos_iniciais: List[VeiculoCreate] = Field(..., min_length=1)
 
     @field_validator("documento")
@@ -171,15 +171,13 @@ class ClienteCreate(BaseModel):
     @classmethod
     def validate_plano(cls, v: str) -> str:
         if not v or not v.strip():
-            raise ValueError("O plano contratado é obrigatório (diário, mensal ou anual).")
+            raise ValueError("O plano contratado é obrigatório (diário ou mensal).")
         norm = v.strip().lower()
         if norm in ("diario", "diário"):
             return "diario"
         if norm == "mensal":
             return "mensal"
-        if norm == "anual":
-            return "anual"
-        raise ValueError("Plano inválido. As opções permitidas são: diário, mensal ou anual.")
+        raise ValueError("Plano inválido. As opções permitidas são: diário ou mensal.")
 
     @field_validator("email", mode="before")
     @classmethod

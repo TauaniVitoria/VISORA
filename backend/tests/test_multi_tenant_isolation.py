@@ -42,7 +42,7 @@ def test_customer_and_vehicle_tenant_isolation(
         "tipo_documento": "CPF",
         "telefone": "(11) 97777-6666",
         "email": "maria@email.com",
-        "plano_tipo": "anual",
+        "plano_tipo": "mensal",
         "veiculos_iniciais": [
             {"placa": "BRA2E19", "marca": "Honda", "modelo": "Civic", "cor": "Branco", "tipo": "carro"}
         ],

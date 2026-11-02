@@ -64,7 +64,7 @@ import { Plano, Tarifa } from '../../core/models/models';
         <!-- Coluna 2: Planos de Assinatura -->
         <div class="card">
           <div class="card-header">
-            <h3>Planos Mensalistas e Anualistas</h3>
+            <h3>Planos Mensalistas</h3>
             <button class="btn-subtle" (click)="showNewPlanForm = !showNewPlanForm">
               {{ showNewPlanForm ? 'Cancelar' : '+ Novo Plano' }}
             </button>
@@ -82,7 +82,6 @@ import { Plano, Tarifa } from '../../core/models/models';
                   <label>Recorrência</label>
                   <select [(ngModel)]="newPlan.tipo_recorrencia" name="p_rec" class="form-control">
                     <option value="mensal">Mensal</option>
-                    <option value="anual">Anual</option>
                   </select>
                 </div>
               </div>
@@ -197,7 +196,6 @@ import { Plano, Tarifa } from '../../core/models/models';
       font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px;
     }
     .plan-badge.mensal { background: #e0f2fe; color: #0369a1; }
-    .plan-badge.anual { background: #fef3c7; color: #b45309; }
     .plan-title { font-weight: 600; color: #1e293b; font-size: 0.95rem; }
     .plan-price { font-size: 1.15rem; font-weight: 700; color: #0284c7; }
     .plan-details { font-size: 0.75rem; color: #64748b; display: flex; flex-direction: column; text-align: right; }

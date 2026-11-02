@@ -627,7 +627,7 @@ class MovementService:
         valor_devido = Decimal("0.00")
 
         if mov.tipo_cobranca == TipoCobranca.PLANO.value:
-            # Isento na cancela pois já é mensalista/anualista
+            # Isento na cancela pois já é mensalista
             valor_devido = Decimal("0.00")
         else:
             # Cobrança avulsa baseada em tarifa

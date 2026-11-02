@@ -1,5 +1,5 @@
 """
-Endpoints de tarifas avulsas, planos mensalistas/anualistas e assinaturas.
+Endpoints de tarifas avulsas, planos mensalistas e assinaturas.
 """
 
 from datetime import timedelta
@@ -55,7 +55,7 @@ def create_plan(
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     db: Session = Depends(get_db),
 ) -> Any:
-    """Cadastra plano de estacionamento (mensal ou anual)."""
+    """Cadastra plano de estacionamento (mensal)."""
     return TariffPlanService.create_plan(db, tenant_id, plan_in)
 
 
@@ -89,10 +89,7 @@ def create_subscription(
 
     # Calcula data_fim conforme recorrência
     d_inicio = sub_in.data_inicio
-    if plano.tipo_recorrencia == "anual":
-        d_fim = d_inicio + timedelta(days=365)
-    else:
-        d_fim = d_inicio + timedelta(days=30)
+    d_fim = d_inicio + timedelta(days=30)
 
     # Cálculo do valor considerando veículos adicionais
     qtd_veiculos = len(sub_in.veiculos_ids)

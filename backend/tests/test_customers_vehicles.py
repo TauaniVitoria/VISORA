@@ -40,10 +40,30 @@ def test_customer_creation_requires_mandatory_phone_and_plan(client: TestClient,
         "documento": "12345678909",
         "tipo_documento": "CPF",
         "telefone": "(11) 98765-0000",
-        "plano_tipo": "quinzenal",  # Invalido: permitido apenas diario, mensal ou anual
+        "plano_tipo": "quinzenal",  # Invalido: permitido apenas diario ou mensal
         "veiculos_iniciais": [{"placa": "NOP1A00", "tipo": "carro"}],
     }, headers=headers)
     assert res_bad_plan.status_code == 422
+
+    # Plano anual foi descontinuado e não é mais aceito
+    res_anual = client.post("/api/v1/customers/", json={
+        "nome": "Plano Anual",
+        "documento": "12345678909",
+        "tipo_documento": "CPF",
+        "telefone": "(11) 98765-0000",
+        "plano_tipo": "anual",
+        "veiculos_iniciais": [{"placa": "NOP1A00", "tipo": "carro"}],
+    }, headers=headers)
+    assert res_anual.status_code == 422
+
+    # Recorrência anual também não é aceita na criação de planos
+    res_plan_anual = client.post("/api/v1/tariffs-plans/plans", json={
+        "nome": "Plano Anual",
+        "tipo_recorrencia": "anual",
+        "valor_base": "1000.00",
+        "limite_veiculos": 1,
+    }, headers=headers)
+    assert res_plan_anual.status_code == 422
 
     # Sem telefone
     res_no_phone = client.post("/api/v1/customers/", json={
@@ -95,7 +115,7 @@ def test_add_vehicle_to_existing_customer(client: TestClient, tenant_a_token: st
         "documento": "12312312000199",
         "tipo_documento": "CNPJ",
         "telefone": "(11) 3214-0000",
-        "plano_tipo": "anual",
+        "plano_tipo": "mensal",
         "veiculos_iniciais": [{"placa": "ABC1D23", "tipo": "carro"}],
     }
     res = client.post("/api/v1/customers/", json=payload, headers=headers)

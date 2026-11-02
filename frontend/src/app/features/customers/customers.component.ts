@@ -101,8 +101,8 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
                   </ng-template>
                 </td>
                 <td>
-                  <button class="btn-details" (click)="openCustomerDetails(c)">
-                    Outros dados
+                  <button class="btn-details" (click)="openCustomerDetails(c)" title="Ver outros dados" aria-label="Ver outros dados do cliente">
+                    ...
                   </button>
                 </td>
                 <td>
@@ -418,7 +418,6 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
                   <option value="">Selecione a modalidade do plano...</option>
                   <option value="diario">Diário</option>
                   <option value="mensal">Mensal</option>
-                  <option value="anual">Anual</option>
                 </select>
                 <small class="text-muted">A seleção do plano é obrigatória para conclusão do cadastro.</small>
               </div>
@@ -686,7 +685,6 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
     }
     .plan-diario { background: #fef3c7; color: #b45309; }
     .plan-mensal { background: #dbeafe; color: #1d4ed8; }
-    .plan-anual { background: #dcfce7; color: #15803d; }
     .vehicles-list {
       display: flex;
       flex-wrap: wrap;
@@ -704,9 +702,9 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       letter-spacing: 0.05em;
     }
     .btn-details {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #166534;
+      background: #ffffff;
+      border: 1px solid #0284c7;
+      color: #0284c7;
       padding: 0.35rem 0.75rem;
       border-radius: 6px;
       font-size: 0.75rem;
@@ -715,8 +713,7 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       transition: all 0.15s;
     }
     .btn-details:hover {
-      background: #dcfce7;
-      border-color: #86efac;
+      background: #e0f2fe;
     }
     .action-buttons {
       display: flex;
@@ -1212,7 +1209,6 @@ export class CustomersComponent implements OnInit {
     const map: Record<string, string> = {
       diario: 'Diário',
       mensal: 'Mensal',
-      anual: 'Anual',
     };
     return map[plan.toLowerCase()] || plan.toUpperCase();
   }
@@ -1331,7 +1327,7 @@ export class CustomersComponent implements OnInit {
       this.isCpfValid(this.newCustomer.documento) &&
       this.isPhoneValid(this.newCustomer.telefone) &&
       !!this.newCustomer.plano_tipo &&
-      ['diario', 'mensal', 'anual'].includes(this.newCustomer.plano_tipo) &&
+      ['diario', 'mensal'].includes(this.newCustomer.plano_tipo) &&
       this.initialVehicle.placa.trim().length >= 7
     );
   }

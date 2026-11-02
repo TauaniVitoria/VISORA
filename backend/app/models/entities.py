@@ -55,7 +55,6 @@ class VeiculoTipo(str, Enum):
 
 class PlanoRecorrencia(str, Enum):
     MENSAL = "mensal"
-    ANUAL = "anual"
 
 
 class AssinaturaStatus(str, Enum):
@@ -191,7 +190,7 @@ class Veiculo(Base):
     assinaturas_vinculadas: Mapped[List["AssinaturaVeiculo"]] = relationship("AssinaturaVeiculo", back_populates="veiculo")
 
 
-# 5. Plano (Mensal / Anual)
+# 5. Plano (Mensal)
 class Plano(Base):
     __tablename__ = "planos"
 

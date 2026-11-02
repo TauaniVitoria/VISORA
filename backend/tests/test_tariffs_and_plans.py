@@ -25,7 +25,7 @@ def test_subscription_requires_vehicle_owned_by_customer(client: TestClient, ten
         "documento": "22200033344",
         "tipo_documento": "CPF",
         "telefone": "(11) 98888-0002",
-        "plano_tipo": "anual",
+        "plano_tipo": "mensal",
         "veiculos_iniciais": [{"placa": "BET2B02", "tipo": "carro"}],
     }).json()
 

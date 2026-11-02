@@ -133,7 +133,7 @@ type Tab = 'resumo' | 'veiculos' | 'historico' | 'planos' | 'financeiro';
           <div class="plan" *ngFor="let p of plans">
             <strong>{{ p.nome }}</strong>
             <span class="price">{{ p.valor_base | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
-              <small>/{{ p.tipo_recorrencia === 'anual' ? 'ano' : 'mês' }}</small></span>
+              <small>/mês</small></span>
             <small>Até {{ p.limite_veiculos }} veículo(s)</small>
             <small *ngIf="p.descricao">{{ p.descricao }}</small>
           </div>
