@@ -1,5 +1,5 @@
 """
-Endpoints de tarifas avulsas, planos mensalistas e assinaturas.
+Endpoints de tarifas avulsas, planos e assinaturas.
 """
 
 from datetime import timedelta
@@ -55,7 +55,7 @@ def create_plan(
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     db: Session = Depends(get_db),
 ) -> Any:
-    """Cadastra plano de estacionamento (mensal)."""
+    """Cadastra plano de estacionamento (diário)."""
     return TariffPlanService.create_plan(db, tenant_id, plan_in)
 
 

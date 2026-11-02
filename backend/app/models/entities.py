@@ -54,7 +54,7 @@ class VeiculoTipo(str, Enum):
 
 
 class PlanoRecorrencia(str, Enum):
-    MENSAL = "mensal"
+    DIARIO = "diario"
 
 
 class AssinaturaStatus(str, Enum):
@@ -153,7 +153,7 @@ class Cliente(Base):
     tipo_documento: Mapped[str] = mapped_column(String(10), default=DocumentoTipo.CPF.value, nullable=False)
     telefone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     email: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    plano_tipo: Mapped[str] = mapped_column(String(20), default="mensal", nullable=False)
+    plano_tipo: Mapped[str] = mapped_column(String(20), default="diario", nullable=False)
     criado_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     estacionamento: Mapped["Estacionamento"] = relationship("Estacionamento", back_populates="clientes")
@@ -190,7 +190,7 @@ class Veiculo(Base):
     assinaturas_vinculadas: Mapped[List["AssinaturaVeiculo"]] = relationship("AssinaturaVeiculo", back_populates="veiculo")
 
 
-# 5. Plano (Mensal)
+# 5. Plano (Diário)
 class Plano(Base):
     __tablename__ = "planos"
 
@@ -198,7 +198,7 @@ class Plano(Base):
     estacionamento_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("estacionamentos.id", ondelete="CASCADE"), nullable=False, index=True)
     nome: Mapped[str] = mapped_column(String(80), nullable=False)
     descricao: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    tipo_recorrencia: Mapped[str] = mapped_column(String(20), default=PlanoRecorrencia.MENSAL.value, nullable=False)
+    tipo_recorrencia: Mapped[str] = mapped_column(String(20), default=PlanoRecorrencia.DIARIO.value, nullable=False)
     valor_base: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     limite_veiculos: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     valor_veiculo_adicional: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=Decimal("0.00"), nullable=False)

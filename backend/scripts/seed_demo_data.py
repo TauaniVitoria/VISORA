@@ -105,7 +105,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "carlos.silva@email.com",
                 "telefone": "(11) 98765-4321",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "BRA2E19", "marca": "Toyota", "modelo": "Corolla XEi", "cor": "Prata", "tipo": "carro"},
                     {"placa": "SPM1A90", "marca": "Honda", "modelo": "PCX 150", "cor": "Cinza", "tipo": "moto"},
@@ -118,7 +118,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "mariana.santos@email.com",
                 "telefone": "(11) 97654-3210",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "ABC1234", "marca": "Honda", "modelo": "Civic Touring", "cor": "Preto", "tipo": "carro"},
                 ],
@@ -142,7 +142,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "fernanda.oliveira@email.com",
                 "telefone": "(11) 95432-1098",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "KGT9082", "marca": "Volkswagen", "modelo": "Golf Highline", "cor": "Cinza", "tipo": "carro"},
                     {"placa": "FER4E56", "marca": "Fiat", "modelo": "500 Cult", "cor": "Vermelho", "tipo": "carro"},
@@ -167,7 +167,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "beatriz.martins@email.com",
                 "telefone": "(11) 93210-9876",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "SPF1234", "marca": "Chevrolet", "modelo": "Onix Premier", "cor": "Prata", "tipo": "carro"},
                 ],
@@ -179,7 +179,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "alexandre.souza@email.com",
                 "telefone": "(11) 92109-8765",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "BRA3A20", "marca": "Fiat", "modelo": "Pulse Audace", "cor": "Azul", "tipo": "carro"},
                 ],
@@ -191,7 +191,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "juliana.castro@email.com",
                 "telefone": "(11) 91098-7654",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "JKG4512", "marca": "Renault", "modelo": "Duster Iconic", "cor": "Verde", "tipo": "carro"},
                     {"placa": "JUL8A90", "marca": "Jeep", "modelo": "Renegade Trailhawk", "cor": "Verde Militar", "tipo": "carro"},
@@ -216,7 +216,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "camila.duarte@email.com",
                 "telefone": "(11) 99876-5432",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "DFG7890", "marca": "BMW", "modelo": "320i M Sport", "cor": "Preto", "tipo": "carro"},
                 ],
@@ -229,7 +229,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "rafael.prado@email.com",
                 "telefone": "(11) 98111-2233",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "BRA9E99", "marca": "Toyota", "modelo": "Yaris XLS", "cor": "Cinza", "tipo": "carro"},
                     {"placa": "MTO1A23", "marca": "Honda", "modelo": "CB 500F", "cor": "Vermelho", "tipo": "moto"},
@@ -242,7 +242,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "patricia.mendes@email.com",
                 "telefone": "(11) 98222-3344",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "RIO9B99", "marca": "Volkswagen", "modelo": "T-Cross Highline", "cor": "Branco", "tipo": "carro"},
                 ],
@@ -266,7 +266,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "larissa.fonseca@email.com",
                 "telefone": "(11) 98444-5566",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "FLA2C19", "marca": "Hyundai", "modelo": "Creta Ultimate", "cor": "Prata", "tipo": "carro"},
                     {"placa": "FLA3C20", "marca": "Yamaha", "modelo": "MT-03", "cor": "Preto", "tipo": "moto"},
@@ -279,7 +279,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "bruno.silveira@email.com",
                 "telefone": "(11) 98555-6677",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "SPX4D56", "marca": "Ford", "modelo": "Territory Titanium", "cor": "Preto", "tipo": "carro"},
                 ],
@@ -303,7 +303,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "marcelo.barbosa@email.com",
                 "telefone": "(11) 98777-8899",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "CAR5H67", "marca": "Mercedes-Benz", "modelo": "C300 Sport", "cor": "Cinza", "tipo": "carro"},
                     {"placa": "CAM1E23", "marca": "Mercedes-Benz", "modelo": "Sprinter 415", "cor": "Branco", "tipo": "caminhao"},
@@ -316,7 +316,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "priscila.faria@email.com",
                 "telefone": "(11) 98888-9900",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "ONB2F34", "marca": "Volvo", "modelo": "Marcopolo G7", "cor": "Prata", "tipo": "onibus"},
                 ],
@@ -340,7 +340,7 @@ def seed_data() -> None:
                 "tipo_doc": "CPF",
                 "email": "isabella.barros@email.com",
                 "telefone": "(11) 99111-1223",
-                "plano_tipo": "mensal",
+                "plano_tipo": "diario",
                 "veiculos": [
                     {"placa": "LUX7M89", "marca": "Audi", "modelo": "Q3 Black Edition", "cor": "Branco", "tipo": "carro"},
                 ],
@@ -549,7 +549,7 @@ def seed_data() -> None:
                     saida_em=saida_em,
                     permanencia_minutos=permanencia,
                     status=status,
-                    tipo_cobranca=TipoCobranca.PLANO.value if cliente.plano_tipo == "mensal" else TipoCobranca.AVULSA.value,
+                    tipo_cobranca=TipoCobranca.PLANO.value if cliente.plano_tipo == "diario" else TipoCobranca.AVULSA.value,
                     observacao=f"Entrada registrada via ALPR para {cliente.nome}",
                 )
                 db.add(mov)

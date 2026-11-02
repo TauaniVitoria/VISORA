@@ -15,7 +15,7 @@ def test_subscription_requires_vehicle_owned_by_customer(client: TestClient, ten
         "documento": "11100022233",
         "tipo_documento": "CPF",
         "telefone": "(11) 98888-0001",
-        "plano_tipo": "mensal",
+        "plano_tipo": "diario",
         "veiculos_iniciais": [{"placa": "ALP1A01", "tipo": "carro"}],
     }).json()
 
@@ -25,14 +25,14 @@ def test_subscription_requires_vehicle_owned_by_customer(client: TestClient, ten
         "documento": "22200033344",
         "tipo_documento": "CPF",
         "telefone": "(11) 98888-0002",
-        "plano_tipo": "mensal",
+        "plano_tipo": "diario",
         "veiculos_iniciais": [{"placa": "BET2B02", "tipo": "carro"}],
     }).json()
 
     # Cria plano
     plan = client.post("/api/v1/tariffs-plans/plans", headers=headers, json={
         "nome": "Plano Corporativo",
-        "tipo_recorrencia": "mensal",
+        "tipo_recorrencia": "diario",
         "valor_base": "200.00",
         "limite_veiculos": 1,
     }).json()

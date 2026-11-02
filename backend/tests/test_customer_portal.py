@@ -30,7 +30,7 @@ def make_customer(client: TestClient, headers: Dict[str, str], nome: str, docume
             "documento": documento,
             "tipo_documento": "CPF",
             "telefone": "(11) 98888-0000",
-            "plano_tipo": "mensal",
+            "plano_tipo": "diario",
             "email": f"contato.{placa.lower()}@mail.com",
             "veiculos_iniciais": [{"placa": placa, "marca": "Fiat", "modelo": "Uno", "cor": "Prata", "tipo": "carro"}],
         },
@@ -325,8 +325,8 @@ def test_portal_subscriptions_and_plans(client: TestClient, tenant_a_token: str,
     customer = make_customer(client, a, "Cliente Plano", "50000000001", "GGG1G11")
     vehicle_id = customer["veiculos"][0]["id"]
 
-    plan_payload = {"tipo_recorrencia": "mensal", "valor_base": "250.00", "limite_veiculos": 1}
-    plan = client.post("/api/v1/tariffs-plans/plans", headers=a, json={"nome": "Mensal Livre", **plan_payload})
+    plan_payload = {"tipo_recorrencia": "diario", "valor_base": "50.00", "limite_veiculos": 1}
+    plan = client.post("/api/v1/tariffs-plans/plans", headers=a, json={"nome": "Diario Livre", **plan_payload})
     assert plan.status_code == 201, plan.text
     client.post("/api/v1/tariffs-plans/plans", headers=b, json={"nome": "Plano do Tenant B", **plan_payload})
 
@@ -346,12 +346,12 @@ def test_portal_subscriptions_and_plans(client: TestClient, tenant_a_token: str,
 
     subs = client.get("/api/v1/portal/subscriptions", headers=portal).json()
     assert len(subs) == 1
-    assert subs[0]["plano_nome"] == "Mensal Livre"
+    assert subs[0]["plano_nome"] == "Diario Livre"
     assert subs[0]["placas"] == ["GGG1G11"]
     assert subs[0]["status"] == "ativa"
 
     plans = client.get("/api/v1/portal/plans", headers=portal).json()
-    assert [p["nome"] for p in plans] == ["Mensal Livre"]  # plano do tenant B não aparece
+    assert [p["nome"] for p in plans] == ["Diario Livre"]  # plano do tenant B não aparece
 
     summary = client.get("/api/v1/portal/summary", headers=portal).json()
     assert summary["assinaturas_ativas"] == 1

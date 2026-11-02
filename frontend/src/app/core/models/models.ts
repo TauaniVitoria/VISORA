@@ -57,7 +57,7 @@ export interface Cliente {
   tipo_documento: 'CPF' | 'CNPJ';
   telefone: string;
   email?: string;
-  plano_tipo: 'diario' | 'mensal' | string;
+  plano_tipo: 'diario' | string;
   criado_em: string;
   acesso_portal?: boolean;
   veiculos: Veiculo[];
@@ -91,7 +91,7 @@ export interface Plano {
   estacionamento_id: string;
   nome: string;
   descricao?: string;
-  tipo_recorrencia: 'mensal';
+  tipo_recorrencia: 'diario';
   valor_base: number;
   limite_veiculos: number;
   valor_veiculo_adicional: number;
@@ -230,7 +230,7 @@ export interface PortalAssinatura {
   id: string;
   plano_id: string;
   plano_nome: string;
-  tipo_recorrencia: 'mensal';
+  tipo_recorrencia: 'diario';
   data_inicio: string;
   data_fim: string;
   status: string;

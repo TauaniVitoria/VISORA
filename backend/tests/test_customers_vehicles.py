@@ -13,7 +13,7 @@ def test_customer_creation_requires_initial_vehicle(client: TestClient, tenant_a
         "documento": "11122233344",
         "tipo_documento": "CPF",
         "telefone": "(11) 98765-4321",
-        "plano_tipo": "mensal",
+        "plano_tipo": "diario",
         "veiculos_iniciais": [],  # Lista vazia de veículos -> Deve falhar na validação
     }
     response = client.post("/api/v1/customers/", json=payload_invalid, headers=headers)
@@ -45,7 +45,7 @@ def test_customer_creation_requires_mandatory_phone_and_plan(client: TestClient,
     }, headers=headers)
     assert res_bad_plan.status_code == 422
 
-    # Plano anual foi descontinuado e não é mais aceito
+    # Plano anual e mensal foram descontinuados e não são mais aceitos
     res_anual = client.post("/api/v1/customers/", json={
         "nome": "Plano Anual",
         "documento": "12345678909",
@@ -56,7 +56,17 @@ def test_customer_creation_requires_mandatory_phone_and_plan(client: TestClient,
     }, headers=headers)
     assert res_anual.status_code == 422
 
-    # Recorrência anual também não é aceita na criação de planos
+    res_mensal = client.post("/api/v1/customers/", json={
+        "nome": "Plano Mensal",
+        "documento": "12345678909",
+        "tipo_documento": "CPF",
+        "telefone": "(11) 98765-0000",
+        "plano_tipo": "mensal",
+        "veiculos_iniciais": [{"placa": "NOP1A00", "tipo": "carro"}],
+    }, headers=headers)
+    assert res_mensal.status_code == 422
+
+    # Recorrência anual e mensal também não são aceitas na criação de planos
     res_plan_anual = client.post("/api/v1/tariffs-plans/plans", json={
         "nome": "Plano Anual",
         "tipo_recorrencia": "anual",
@@ -65,12 +75,20 @@ def test_customer_creation_requires_mandatory_phone_and_plan(client: TestClient,
     }, headers=headers)
     assert res_plan_anual.status_code == 422
 
+    res_plan_mensal = client.post("/api/v1/tariffs-plans/plans", json={
+        "nome": "Plano Mensal",
+        "tipo_recorrencia": "mensal",
+        "valor_base": "250.00",
+        "limite_veiculos": 1,
+    }, headers=headers)
+    assert res_plan_mensal.status_code == 422
+
     # Sem telefone
     res_no_phone = client.post("/api/v1/customers/", json={
         "nome": "Sem Telefone",
         "documento": "12345678909",
         "tipo_documento": "CPF",
-        "plano_tipo": "mensal",
+        "plano_tipo": "diario",
         "veiculos_iniciais": [{"placa": "NOP1A00", "tipo": "carro"}],
     }, headers=headers)
     assert res_no_phone.status_code == 422
@@ -99,7 +117,7 @@ def test_prevent_duplicate_plates_in_same_tenant(client: TestClient, tenant_a_to
         "documento": "66677788899",
         "tipo_documento": "CPF",
         "telefone": "(11) 98765-2222",
-        "plano_tipo": "mensal",
+        "plano_tipo": "diario",
         "veiculos_iniciais": [{"placa": "XYZ-9F88", "tipo": "carro"}],  # Mesma placa com hífen
     }
     res_2 = client.post("/api/v1/customers/", json=payload_2, headers=headers)
@@ -115,7 +133,7 @@ def test_add_vehicle_to_existing_customer(client: TestClient, tenant_a_token: st
         "documento": "12312312000199",
         "tipo_documento": "CNPJ",
         "telefone": "(11) 3214-0000",
-        "plano_tipo": "mensal",
+        "plano_tipo": "diario",
         "veiculos_iniciais": [{"placa": "ABC1D23", "tipo": "carro"}],
     }
     res = client.post("/api/v1/customers/", json=payload, headers=headers)

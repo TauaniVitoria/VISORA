@@ -417,7 +417,6 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
                 <select [(ngModel)]="newCustomer.plano_tipo" name="plano_tipo" required class="form-control">
                   <option value="">Selecione a modalidade do plano...</option>
                   <option value="diario">Diário</option>
-                  <option value="mensal">Mensal</option>
                 </select>
                 <small class="text-muted">A seleção do plano é obrigatória para conclusão do cadastro.</small>
               </div>
@@ -684,7 +683,6 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       text-transform: uppercase;
     }
     .plan-diario { background: #fef3c7; color: #b45309; }
-    .plan-mensal { background: #dbeafe; color: #1d4ed8; }
     .vehicles-list {
       display: flex;
       flex-wrap: wrap;
@@ -1208,7 +1206,6 @@ export class CustomersComponent implements OnInit {
     if (!plan) return '—';
     const map: Record<string, string> = {
       diario: 'Diário',
-      mensal: 'Mensal',
     };
     return map[plan.toLowerCase()] || plan.toUpperCase();
   }
@@ -1327,7 +1324,7 @@ export class CustomersComponent implements OnInit {
       this.isCpfValid(this.newCustomer.documento) &&
       this.isPhoneValid(this.newCustomer.telefone) &&
       !!this.newCustomer.plano_tipo &&
-      ['diario', 'mensal'].includes(this.newCustomer.plano_tipo) &&
+      ['diario'].includes(this.newCustomer.plano_tipo) &&
       this.initialVehicle.placa.trim().length >= 7
     );
   }
