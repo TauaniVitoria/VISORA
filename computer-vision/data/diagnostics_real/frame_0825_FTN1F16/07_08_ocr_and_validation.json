@@ -1,0 +1,42 @@
+{
+  "frame_idx": 825,
+  "vehicle": {
+    "class": "car",
+    "confidence": 0.8925,
+    "bbox": [
+      845,
+      394,
+      1336,
+      822
+    ]
+  },
+  "plate_detection": {
+    "confidence": 0.9541,
+    "bbox_global": [
+      1023,
+      690,
+      1158,
+      729
+    ],
+    "bbox_local": [
+      178,
+      296,
+      313,
+      335
+    ],
+    "aspect_ratio": 3.462
+  },
+  "ocr": {
+    "raw_text": "FTN1F16",
+    "recognized_text": "FTN1F16",
+    "confidence": 0.9747,
+    "model_used": "crnn_ctc",
+    "is_trained_weights": true
+  },
+  "validation": {
+    "is_valid": true,
+    "normalized_plate": "FTN1F16",
+    "pattern": "mercosul",
+    "error_message": null
+  }
+}

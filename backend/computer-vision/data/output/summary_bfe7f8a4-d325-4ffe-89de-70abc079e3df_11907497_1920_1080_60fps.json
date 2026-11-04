@@ -1,0 +1,56 @@
+{
+  "metrics": {
+    "video_path": "/Users/tvitoriaferreira/Documents/alpr_project/backend/computer-vision/data/input/uploads/bfe7f8a4-d325-4ffe-89de-70abc079e3df_11907497_1920_1080_60fps.mp4",
+    "total_frames_processed": 710,
+    "processing_time_seconds": 68.074,
+    "average_fps": 10.43,
+    "vehicles_detected_count": 2084,
+    "plates_detected_count": 227,
+    "valid_plates_count": 21,
+    "invalid_plates_count": 206,
+    "confirmed_passages_count": 2,
+    "valid_crops_count": 227,
+    "ocr_recognized_count": 53,
+    "mean_vehicle_confidence": 0.7411,
+    "mean_plate_confidence": 0.6522,
+    "mean_ocr_confidence": 0.381
+  },
+  "events": [
+    {
+      "track_id": 27,
+      "vehicle_class": "car",
+      "plate": "EZV0448",
+      "pattern": "antigo",
+      "det_confidence": 0.6839325825373331,
+      "ocr_confidence": 0.9516,
+      "first_frame_idx": 324,
+      "last_frame_idx": 504,
+      "timestamp_sec": 8.4084,
+      "bbox_plate": [
+        793,
+        470,
+        847,
+        487
+      ],
+      "total_hits": 3
+    },
+    {
+      "track_id": 69,
+      "vehicle_class": "car",
+      "plate": "EZV0448",
+      "pattern": "antigo",
+      "det_confidence": 0.5863104363282522,
+      "ocr_confidence": 0.9612999999999999,
+      "first_frame_idx": 1311,
+      "last_frame_idx": 1464,
+      "timestamp_sec": 24.424400000000002,
+      "bbox_plate": [
+        417,
+        465,
+        488,
+        483
+      ],
+      "total_hits": 3
+    }
+  ]
+}

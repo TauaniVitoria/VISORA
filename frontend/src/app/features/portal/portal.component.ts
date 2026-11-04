@@ -189,28 +189,28 @@ type Tab = 'resumo' | 'veiculos' | 'historico' | 'planos' | 'financeiro';
     .tabs { display: flex; gap: 0.25rem; flex-wrap: wrap; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.25rem; }
     .tab { background: none; border: none; padding: 0.65rem 1.1rem; color: #64748b; font-weight: 500;
       border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; }
-    .tab.active { color: #0284c7; border-bottom-color: #0284c7; }
-    h3 { font-size: 1.05rem; color: #1e293b; margin: 1.5rem 0 0.75rem; }
+    .tab.active { color: #d97706; border-bottom-color: #d97706; }
+    h3 { font-size: 1.05rem; color: #18181b; margin: 1.5rem 0 0.75rem; }
     .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-    .kpi { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem;
-      display: flex; flex-direction: column; gap: 0.25rem; color: #64748b; font-size: 0.8rem; }
-    .kpi-value { font-size: 1.6rem; font-weight: 700; color: #0f172a; }
+    .kpi { background: #fff; border: 1px solid #e7e5e4; border-radius: 10px; padding: 1rem;
+      display: flex; flex-direction: column; gap: 0.25rem; color: #71717a; font-size: 0.8rem; }
+    .kpi-value { font-size: 1.6rem; font-weight: 700; color: #18181b; }
     .kpi.warn .kpi-value { color: #b45309; }
-    .table-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow-x: auto; }
+    .table-card { background: #fff; border: 1px solid #e7e5e4; border-radius: 10px; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    th { background: #f8fafc; color: #475569; text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid #e2e8f0; }
-    td { padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+    th { background: #fafaf9; color: #52525b; text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid #e7e5e4; }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid #f5f5f4; color: #18181b; }
     tr:last-child td { border-bottom: none; }
     .plate { font-family: monospace; font-weight: 600; letter-spacing: 0.05em; }
     .badge { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.75rem;
-      font-weight: 600; background: #f1f5f9; color: #475569; }
+      font-weight: 600; background: #f5f5f4; color: #52525b; }
     .badge.ok, .badge.pago, .badge.concluida { background: #dcfce7; color: #166534; }
     .badge.pendente, .badge.aberta { background: #fef3c7; color: #b45309; }
     .badge.cancelado, .badge.estornado, .badge.inconsistente { background: #fee2e2; color: #991b1b; }
     .plans { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
-    .plan { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem;
+    .plan { background: #fff; border: 1px solid #e7e5e4; border-radius: 10px; padding: 1rem;
       display: flex; flex-direction: column; gap: 0.3rem; }
-    .price { font-size: 1.3rem; font-weight: 700; color: #0284c7; }
+    .price { font-size: 1.3rem; font-weight: 700; color: #d97706; }
     .empty, .hint, .loading { color: #94a3b8; font-size: 0.875rem; }
     .hint { margin-top: 1rem; }
   `],

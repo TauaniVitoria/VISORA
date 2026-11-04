@@ -169,28 +169,28 @@ import { AuditoriaLog } from '../../core/models/models';
       font-size: 0.75rem;
       font-weight: 600;
       &.action-create { background: #dcfce7; color: #166534; }
-      &.action-update { background: #e0f2fe; color: #0369a1; }
+      &.action-update { background: #fef3c7; color: #b45309; }
       &.action-correction { background: #fef3c7; color: #b45309; }
       &.action-delete { background: #fee2e2; color: #991b1b; }
-      &.action-default { background: #f1f5f9; color: #475569; }
+      &.action-default { background: #f5f5f4; color: #52525b; }
     }
     .font-mono { font-family: monospace; }
     .text-xs { font-size: 0.75rem; }
     .text-sm { font-size: 0.825rem; }
-    .text-muted { color: #64748b; }
+    .text-muted { color: #71717a; }
     .btn-details {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
+      background: #fafaf9;
+      border: 1px solid #d6d3d1;
       padding: 0.25rem 0.65rem;
       border-radius: 4px;
       font-size: 0.75rem;
       cursor: pointer;
-      &:hover { background: #f1f5f9; }
+      &:hover { background: #f5f5f4; }
     }
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.5);
+      background: rgba(9, 9, 11, 0.55);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -210,12 +210,12 @@ import { AuditoriaLog } from '../../core/models/models';
     }
     .modal-header {
       padding: 1rem 1.25rem;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e7e5e4;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      h3 { margin: 0; font-size: 1.15rem; color: #0f172a; }
-      .btn-close { background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #64748b; }
+      h3 { margin: 0; font-size: 1.15rem; color: #18181b; }
+      .btn-close { background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #71717a; }
     }
     .modal-body {
       padding: 1.25rem;
@@ -228,14 +228,14 @@ import { AuditoriaLog } from '../../core/models/models';
       display: flex;
       gap: 0.5rem;
       font-size: 0.875rem;
-      .info-label { font-weight: 600; color: #475569; width: 130px; }
+      .info-label { font-weight: 600; color: #52525b; width: 130px; }
     }
     .json-box {
       margin-top: 0.5rem;
-      h4 { font-size: 0.825rem; color: #475569; margin: 0 0 0.25rem 0; }
+      h4 { font-size: 0.825rem; color: #52525b; margin: 0 0 0.25rem 0; }
       pre {
-        background: #0f172a;
-        color: #38bdf8;
+        background: #18181b;
+        color: #f59e0b;
         padding: 0.75rem;
         border-radius: 6px;
         font-size: 0.75rem;

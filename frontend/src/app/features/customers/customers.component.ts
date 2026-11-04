@@ -597,7 +597,7 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
     h2 { margin: 0; color: #0f172a; font-size: 1.5rem; font-weight: 700; }
     .subtitle { margin: 0.25rem 0 0; color: #64748b; font-size: 0.875rem; }
     .btn-primary {
-      background: #0284c7;
+      background: #d97706;
       color: #fff;
       border: none;
       padding: 0.6rem 1.25rem;
@@ -607,32 +607,32 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       font-size: 0.875rem;
       transition: background 0.2s;
     }
-    .btn-primary:hover:not(:disabled) { background: #0369a1; }
+    .btn-primary:hover:not(:disabled) { background: #b45309; }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-secondary {
-      background: #f1f5f9;
-      color: #334155;
-      border: 1px solid #cbd5e1;
+      background: #f5f5f4;
+      color: #27272a;
+      border: 1px solid #d6d3d1;
       padding: 0.6rem 1.25rem;
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
     }
-    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-secondary:hover { background: #e7e5e4; }
     .filter-bar { margin-bottom: 1.25rem; }
     .search-input {
       width: 100%;
       max-width: 480px;
       padding: 0.65rem 1rem;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #d6d3d1;
       border-radius: 8px;
       outline: none;
       font-size: 0.875rem;
     }
-    .search-input:focus { border-color: #0284c7; }
+    .search-input:focus { border-color: #d97706; }
     .content-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e7e5e4;
       border-radius: 12px;
       padding: 1rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -644,13 +644,13 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       text-align: left;
     }
     .data-table th {
-      background: #f8fafc;
-      color: #64748b;
+      background: #fafaf9;
+      color: #71717a;
       font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
       padding: 0.75rem 1rem;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e7e5e4;
       user-select: none;
     }
     .sortable-th {
@@ -658,20 +658,20 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       transition: color 0.15s, background 0.15s;
     }
     .sortable-th:hover {
-      background: #f1f5f9;
-      color: #0f172a;
+      background: #f5f5f4;
+      color: #18181b;
     }
     .sort-indicator {
       display: inline-block;
       margin-left: 0.35rem;
       font-size: 0.7rem;
-      color: #0284c7;
+      color: #d97706;
     }
     .data-table td {
       padding: 0.85rem 1rem;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid #f5f5f4;
       font-size: 0.875rem;
-      color: #1e293b;
+      color: #18181b;
       vertical-align: middle;
     }
     .plan-badge {
@@ -689,9 +689,9 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       gap: 0.4rem;
     }
     .vehicle-chip {
-      background: #f8fafc;
-      color: #0f172a;
-      border: 1px solid #cbd5e1;
+      background: #fafaf9;
+      color: #18181b;
+      border: 1px solid #d6d3d1;
       padding: 0.2rem 0.55rem;
       border-radius: 4px;
       font-size: 0.75rem;
@@ -700,9 +700,9 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       letter-spacing: 0.05em;
     }
     .btn-details {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      color: #0284c7;
+      background: #fafaf9;
+      border: 1px solid #d6d3d1;
+      color: #d97706;
       padding: 0.35rem 0.75rem;
       border-radius: 6px;
       font-size: 0.75rem;
@@ -711,7 +711,7 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       transition: background 0.15s;
     }
     .btn-details:hover {
-      background: #e0f2fe;
+      background: #fef3c7;
     }
     .action-buttons {
       display: flex;
@@ -719,9 +719,9 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       gap: 0.5rem;
     }
     .btn-action {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      color: #0284c7;
+      background: #fafaf9;
+      border: 1px solid #d6d3d1;
+      color: #d97706;
       padding: 0.35rem 0.75rem;
       border-radius: 6px;
       font-size: 0.75rem;
@@ -729,7 +729,7 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       cursor: pointer;
       transition: background 0.15s;
     }
-    .btn-action:hover { background: #e0f2fe; }
+    .btn-action:hover { background: #fef3c7; }
     .btn-action.danger { color: #dc2626; }
     .btn-action.danger:hover { background: #fee2e2; }
     .portal-badge {
@@ -905,7 +905,7 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       gap: 0.5rem;
     }
     .btn-filter {
-      background: #0284c7;
+      background: #d97706;
       color: #fff;
       border: none;
       padding: 0.45rem 0.9rem;
@@ -914,11 +914,11 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       font-weight: 600;
       cursor: pointer;
     }
-    .btn-filter:hover { background: #0369a1; }
+    .btn-filter:hover { background: #b45309; }
     .btn-clear-filter {
       background: #ffffff;
-      color: #64748b;
-      border: 1px solid #cbd5e1;
+      color: #71717a;
+      border: 1px solid #d6d3d1;
       padding: 0.45rem 0.75rem;
       border-radius: 6px;
       font-size: 0.8rem;
@@ -927,7 +927,7 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
     .movements-table-container {
       max-height: 280px;
       overflow-y: auto;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e7e5e4;
       border-radius: 8px;
     }
     .row-parked {
@@ -946,18 +946,18 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       border: 1px solid #86efac;
     }
     .badge-finished {
-      background: #f1f5f9;
-      color: #475569;
-      border: 1px solid #cbd5e1;
+      background: #f5f5f4;
+      color: #52525b;
+      border: 1px solid #d6d3d1;
     }
     .loading-state, .empty-movements {
       text-align: center;
       padding: 2rem;
-      color: #64748b;
+      color: #71717a;
       font-size: 0.85rem;
-      background: #f8fafc;
+      background: #fafaf9;
       border-radius: 8px;
-      border: 1px dashed #cbd5e1;
+      border: 1px dashed #d6d3d1;
     }
 
     /* Forms */
@@ -965,11 +965,11 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       font-size: 0.8rem;
       font-weight: 700;
       text-transform: uppercase;
-      color: #0284c7;
+      color: #d97706;
       letter-spacing: 0.05em;
       margin: 1rem 0 0.75rem;
       padding-bottom: 0.25rem;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e7e5e4;
     }
     .form-section-title:first-child { margin-top: 0; }
     .form-row {
@@ -984,19 +984,19 @@ type MovSortColumn = 'placa' | 'entrada_em' | 'hora_entrada' | 'saida_em' | 'hor
       display: block;
       font-size: 0.75rem;
       font-weight: 600;
-      color: #475569;
+      color: #52525b;
       margin-bottom: 0.25rem;
     }
     .form-control {
       width: 100%;
       box-sizing: border-box;
       padding: 0.55rem 0.75rem;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #d6d3d1;
       border-radius: 6px;
       font-size: 0.85rem;
       outline: none;
     }
-    .form-control:focus { border-color: #0284c7; }
+    .form-control:focus { border-color: #d97706; }
     .disabled-input {
       background: #f1f5f9;
       color: #64748b;

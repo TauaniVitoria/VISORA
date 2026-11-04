@@ -1,0 +1,42 @@
+{
+  "frame_idx": 822,
+  "vehicle": {
+    "class": "car",
+    "confidence": 0.8845,
+    "bbox": [
+      865,
+      391,
+      1331,
+      817
+    ]
+  },
+  "plate_detection": {
+    "confidence": 0.7198,
+    "bbox_global": [
+      1034,
+      693,
+      1159,
+      727
+    ],
+    "bbox_local": [
+      169,
+      302,
+      294,
+      336
+    ],
+    "aspect_ratio": 3.676
+  },
+  "ocr": {
+    "raw_text": "FTNIF16",
+    "recognized_text": "FTNIF16",
+    "confidence": 0.6635,
+    "model_used": "easyocr",
+    "is_trained_weights": true
+  },
+  "validation": {
+    "is_valid": true,
+    "normalized_plate": "FTN1F16",
+    "pattern": "mercosul",
+    "error_message": null
+  }
+}

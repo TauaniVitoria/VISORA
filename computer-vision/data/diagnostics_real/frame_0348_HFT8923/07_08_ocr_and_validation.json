@@ -1,0 +1,42 @@
+{
+  "frame_idx": 348,
+  "vehicle": {
+    "class": "car",
+    "confidence": 0.8181,
+    "bbox": [
+      1009,
+      397,
+      1333,
+      748
+    ]
+  },
+  "plate_detection": {
+    "confidence": 0.764,
+    "bbox_global": [
+      1045,
+      726,
+      1201,
+      768
+    ],
+    "bbox_local": [
+      36,
+      329,
+      192,
+      371
+    ],
+    "aspect_ratio": 3.714
+  },
+  "ocr": {
+    "raw_text": "HFT8923",
+    "recognized_text": "HFT8923",
+    "confidence": 0.9969,
+    "model_used": "crnn_ctc",
+    "is_trained_weights": true
+  },
+  "validation": {
+    "is_valid": true,
+    "normalized_plate": "HFT8923",
+    "pattern": "antigo",
+    "error_message": null
+  }
+}

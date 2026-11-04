@@ -104,12 +104,12 @@ import { ApiService } from '../../core/services/api.service';
       width: 100%; box-sizing: border-box; padding: 0.6rem 0.8rem;
       border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.875rem; outline: none;
     }
-    .form-control:focus { border-color: #0284c7; }
+    .form-control:focus { border-color: #d97706; }
     .btn-primary {
-      background: #0284c7; color: white; border: none; padding: 0.65rem 1.25rem;
+      background: #d97706; color: white; border: none; padding: 0.65rem 1.25rem;
       border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 0.5rem;
     }
-    .btn-primary:hover { background: #0369a1; }
+    .btn-primary:hover { background: #b45309; }
     .notification-banner {
       padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem;
     }

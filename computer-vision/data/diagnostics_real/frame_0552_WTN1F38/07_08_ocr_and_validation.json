@@ -1,0 +1,42 @@
+{
+  "frame_idx": 552,
+  "vehicle": {
+    "class": "car",
+    "confidence": 0.8142,
+    "bbox": [
+      967,
+      402,
+      1262,
+      739
+    ]
+  },
+  "plate_detection": {
+    "confidence": 0.7088,
+    "bbox_global": [
+      1050,
+      657,
+      1126,
+      685
+    ],
+    "bbox_local": [
+      83,
+      255,
+      159,
+      283
+    ],
+    "aspect_ratio": 2.714
+  },
+  "ocr": {
+    "raw_text": "FWTN1F38",
+    "recognized_text": "FWTN1F38",
+    "confidence": 0.6821,
+    "model_used": "crnn_ctc",
+    "is_trained_weights": true
+  },
+  "validation": {
+    "is_valid": true,
+    "normalized_plate": "WTN1F38",
+    "pattern": "mercosul",
+    "error_message": null
+  }
+}

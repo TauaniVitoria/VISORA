@@ -1,0 +1,42 @@
+{
+  "frame_idx": 594,
+  "vehicle": {
+    "class": "car",
+    "confidence": 0.8149,
+    "bbox": [
+      951,
+      394,
+      1288,
+      779
+    ]
+  },
+  "plate_detection": {
+    "confidence": 0.6112,
+    "bbox_global": [
+      1028,
+      693,
+      1138,
+      722
+    ],
+    "bbox_local": [
+      77,
+      299,
+      187,
+      328
+    ],
+    "aspect_ratio": 3.793
+  },
+  "ocr": {
+    "raw_text": "FW19F23",
+    "recognized_text": "FW19F23",
+    "confidence": 0.7014,
+    "model_used": "crnn_ctc",
+    "is_trained_weights": true
+  },
+  "validation": {
+    "is_valid": true,
+    "normalized_plate": "FWI9F23",
+    "pattern": "mercosul",
+    "error_message": null
+  }
+}

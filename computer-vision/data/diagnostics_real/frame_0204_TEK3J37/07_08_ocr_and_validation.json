@@ -1,0 +1,42 @@
+{
+  "frame_idx": 204,
+  "vehicle": {
+    "class": "car",
+    "confidence": 0.581,
+    "bbox": [
+      977,
+      382,
+      1367,
+      816
+    ]
+  },
+  "plate_detection": {
+    "confidence": 0.8234,
+    "bbox_global": [
+      1067,
+      672,
+      1187,
+      707
+    ],
+    "bbox_local": [
+      90,
+      290,
+      210,
+      325
+    ],
+    "aspect_ratio": 3.429
+  },
+  "ocr": {
+    "raw_text": "EK3J7",
+    "recognized_text": "TEK3J37",
+    "confidence": 0.8234,
+    "model_used": "crnn_ctc+easyocr",
+    "is_trained_weights": true
+  },
+  "validation": {
+    "is_valid": true,
+    "normalized_plate": "TEK3J37",
+    "pattern": "mercosul",
+    "error_message": null
+  }
+}

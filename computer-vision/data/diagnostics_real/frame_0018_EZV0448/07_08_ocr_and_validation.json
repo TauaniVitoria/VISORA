@@ -1,0 +1,42 @@
+{
+  "frame_idx": 18,
+  "vehicle": {
+    "class": "car",
+    "confidence": 0.8766,
+    "bbox": [
+      896,
+      394,
+      1331,
+      818
+    ]
+  },
+  "plate_detection": {
+    "confidence": 0.8043,
+    "bbox_global": [
+      1029,
+      697,
+      1164,
+      742
+    ],
+    "bbox_local": [
+      133,
+      303,
+      268,
+      348
+    ],
+    "aspect_ratio": 3.0
+  },
+  "ocr": {
+    "raw_text": "EZV0448",
+    "recognized_text": "EZV0448",
+    "confidence": 0.6152,
+    "model_used": "easyocr",
+    "is_trained_weights": true
+  },
+  "validation": {
+    "is_valid": true,
+    "normalized_plate": "EZV0448",
+    "pattern": "antigo",
+    "error_message": null
+  }
+}

@@ -13,62 +13,21 @@ import { AuthService } from '../../../core/services/auth.service';
       <!-- Área esquerda: Apresentação (50%) -->
       <section class="presentation-pane">
         <div class="presentation-content">
-          <div class="brand-badge">
+          <a routerLink="/apresentacao" class="brand-badge" title="Voltar para a Página Inicial do VISORA">
             <div class="logo-box">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="4"></rect>
-                <path d="M9 17V7h4a3 3 0 0 1 0 6H9"></path>
+                <path d="M7 7l5 10 5-10"></path>
               </svg>
             </div>
             <span class="brand-title">VISORA</span>
-          </div>
+          </a>
 
           <div class="hero-text">
-            <h1>Bem-vindo ao VISORA</h1>
+            <h1>Seja bem-vindo(a)!</h1>
             <p class="hero-description">
               Inteligência e tecnologia para uma gestão de estacionamentos mais eficiente.
             </p>
-          </div>
-
-          <!-- Destaques Tecnológicos -->
-          <div class="tech-highlights">
-            <div class="highlight-item">
-              <div class="highlight-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
-                  <path d="M23 7l-7 5 7 5V7z"></path>
-                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-                </svg>
-              </div>
-              <div class="highlight-info">
-                <strong>Reconhecimento ALPR em Tempo Real</strong>
-                <span>Redes neurais YOLOv8 e CRNN com validação Mercosul e Antigo.</span>
-              </div>
-            </div>
-
-            <div class="highlight-item">
-              <div class="highlight-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-              </div>
-              <div class="highlight-info">
-                <strong>Automação de Entrada e Saída</strong>
-                <span>Controle de permanência, bilhetagem instantânea e tarifas dinâmicas.</span>
-              </div>
-            </div>
-
-            <div class="highlight-item">
-              <div class="highlight-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
-              </div>
-              <div class="highlight-info">
-                <strong>Segurança e Isolamento Multi-tenant</strong>
-                <span>Auditoria permanente, conformidade LGPD e portal exclusivo do cliente.</span>
-              </div>
-            </div>
           </div>
 
           <div class="presentation-footer">
@@ -149,6 +108,12 @@ import { AuthService } from '../../../core/services/auth.service';
               <span *ngIf="!loading">Entrar no VISORA</span>
               <span *ngIf="loading">Autenticando...</span>
             </button>
+
+            <div class="back-to-landing">
+              <a routerLink="/apresentacao" class="back-link">
+                ← Conhecer a plataforma VISORA (Página Inicial)
+              </a>
+            </div>
           </form>
         </div>
       </section>
@@ -159,42 +124,61 @@ import { AuthService } from '../../../core/services/auth.service';
       min-height: 100vh;
       display: flex;
       width: 100%;
-      background: #0b0f17;
-      color: #f3f4f6;
+      background: #09090b;
+      color: #f4f4f5;
     }
 
     /* ====== Lado Esquerdo: Apresentação (50%) ====== */
     .presentation-pane {
       width: 50%;
-      background: linear-gradient(145deg, #070a10 0%, #0f172a 60%, #082f49 100%);
-      padding: 3.5rem 4rem;
+      background: linear-gradient(to top, rgba(217, 119, 6, 0.24) 0%, rgba(69, 26, 3, 0.45) 30%, #18181b 70%, #09090b 100%);
+      padding: 4.5rem 4rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       position: relative;
-      border-right: 1px solid #1e293b;
+      border-right: 1px solid #27272a;
       box-sizing: border-box;
     }
 
     .presentation-content {
-      max-width: 540px;
+      max-width: 500px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 2.2rem;
+      justify-content: space-between;
+      min-height: 460px;
+      gap: 2.5rem;
     }
 
     .brand-badge {
       display: flex;
       align-items: center;
       gap: 0.85rem;
+      text-decoration: none;
+    }
+
+    .back-to-landing {
+      margin-top: 1.35rem;
+      text-align: center;
+    }
+
+    .back-link {
+      color: #a1a1aa;
+      font-size: 0.82rem;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: #f59e0b;
     }
 
     .logo-box {
       width: 48px;
       height: 48px;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -219,71 +203,21 @@ import { AuthService } from '../../../core/services/auth.service';
 
     .hero-description {
       font-size: 1.05rem;
-      color: #94a3b8;
+      color: #a1a1aa;
       line-height: 1.55;
       margin: 0;
     }
 
-    .tech-highlights {
-      display: flex;
-      flex-direction: column;
-      gap: 1.1rem;
-    }
-
-    .highlight-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(30, 41, 59, 0.8);
-      padding: 0.95rem 1.15rem;
-      border-radius: 10px;
-      transition: border-color 0.2s;
-    }
-
-    .highlight-item:hover {
-      border-color: rgba(56, 189, 248, 0.4);
-    }
-
-    .highlight-icon {
-      width: 36px;
-      height: 36px;
-      background: rgba(56, 189, 248, 0.1);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .highlight-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-    }
-
-    .highlight-info strong {
-      font-size: 0.9rem;
-      color: #f1f5f9;
-      font-weight: 600;
-    }
-
-    .highlight-info span {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      line-height: 1.35;
-    }
-
     .presentation-footer {
       font-size: 0.75rem;
-      color: #64748b;
+      color: #71717a;
       letter-spacing: 0.05em;
     }
 
     /* ====== Lado Direito: Formulário (50%) ====== */
     .form-pane {
       width: 50%;
-      background: #0b0f17;
+      background: #09090b;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -309,7 +243,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
     .form-header p {
       font-size: 0.875rem;
-      color: #94a3b8;
+      color: #a1a1aa;
       margin: 0;
     }
 
@@ -321,7 +255,7 @@ import { AuthService } from '../../../core/services/auth.service';
       display: block;
       font-size: 0.8rem;
       font-weight: 600;
-      color: #cbd5e1;
+      color: #d4d4d8;
       margin-bottom: 0.45rem;
     }
 
@@ -329,8 +263,8 @@ import { AuthService } from '../../../core/services/auth.service';
       width: 100%;
       box-sizing: border-box;
       padding: 0.75rem 1rem;
-      background: #111827;
-      border: 1px solid #1f2937;
+      background: #18181b;
+      border: 1px solid #27272a;
       border-radius: 8px;
       color: #ffffff;
       font-size: 0.9rem;
@@ -339,9 +273,9 @@ import { AuthService } from '../../../core/services/auth.service';
     }
 
     .form-control:focus {
-      border-color: #0284c7;
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
-      background: #0f172a;
+      border-color: #d97706;
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+      background: #18181b;
     }
 
     .password-input-group {
@@ -359,7 +293,7 @@ import { AuthService } from '../../../core/services/auth.service';
       right: 0.65rem;
       background: none;
       border: none;
-      color: #64748b;
+      color: #71717a;
       cursor: pointer;
       padding: 0.35rem;
       display: flex;
@@ -370,7 +304,7 @@ import { AuthService } from '../../../core/services/auth.service';
     }
 
     .btn-toggle-password:hover {
-      color: #38bdf8;
+      color: #f59e0b;
     }
 
     .form-extras {
@@ -385,7 +319,7 @@ import { AuthService } from '../../../core/services/auth.service';
       display: flex;
       align-items: center;
       gap: 0.45rem;
-      color: #94a3b8;
+      color: #a1a1aa;
       cursor: pointer;
       margin: 0;
       font-weight: normal;
@@ -393,36 +327,36 @@ import { AuthService } from '../../../core/services/auth.service';
 
     .remember-label input[type="checkbox"] {
       cursor: pointer;
-      accent-color: #0284c7;
+      accent-color: #d97706;
     }
 
     .forgot-link {
-      color: #38bdf8;
+      color: #f59e0b;
       text-decoration: none;
       font-weight: 500;
       transition: color 0.2s;
     }
 
     .forgot-link:hover {
-      color: #7dd3fc;
+      color: #fbbf24;
       text-decoration: underline;
     }
 
     .btn-submit {
       width: 100%;
       padding: 0.85rem;
-      background: #0284c7;
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
       color: #ffffff;
       border: none;
       border-radius: 8px;
       font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
+      transition: filter 0.2s, transform 0.1s;
     }
 
     .btn-submit:hover:not(:disabled) {
-      background: #0369a1;
+      filter: brightness(1.08);
     }
 
     .btn-submit:active:not(:disabled) {

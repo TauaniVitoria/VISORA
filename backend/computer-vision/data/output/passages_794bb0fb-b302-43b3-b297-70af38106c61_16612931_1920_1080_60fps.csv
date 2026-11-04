@@ -1,0 +1,7 @@
+track_id,vehicle_class,plate,pattern,det_confidence,ocr_confidence,first_frame_idx,last_frame_idx,timestamp_sec,bbox_plate_x1,bbox_plate_y1,bbox_plate_x2,bbox_plate_y2,total_hits
+2,car,EZV0448,antigo,0.7568,0.864,0,24,0.4,1027,701,1165,746,3
+3,car,TEK3J37,mercosul,0.8176,0.9211,162,210,3.504,1049,677,1184,715,3
+4,car,FWW7994,antigo,0.8285,0.9522,336,378,6.306,1067,676,1182,702,3
+5,car,HFT8923,antigo,0.6108,0.9211,531,561,9.359,969,660,1132,695,3
+6,car,FTN1F16,mercosul,0.8788,0.8665,792,828,13.814,1023,696,1160,734,3
+8,car,GDI3B67,mercosul,0.9063,0.7231,1008,1041,17.367,908,786,1090,838,3

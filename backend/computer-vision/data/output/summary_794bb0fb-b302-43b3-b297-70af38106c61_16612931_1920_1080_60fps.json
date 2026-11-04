@@ -1,0 +1,128 @@
+{
+  "metrics": {
+    "video_path": "/Users/tvitoriaferreira/Documents/alpr_project/backend/computer-vision/data/input/uploads/794bb0fb-b302-43b3-b297-70af38106c61_16612931_1920_1080_60fps.mp4",
+    "total_frames_processed": 368,
+    "processing_time_seconds": 27.014,
+    "average_fps": 13.62,
+    "vehicles_detected_count": 508,
+    "plates_detected_count": 51,
+    "valid_plates_count": 24,
+    "invalid_plates_count": 27,
+    "confirmed_passages_count": 6,
+    "valid_crops_count": 51,
+    "ocr_recognized_count": 35,
+    "mean_vehicle_confidence": 0.8733,
+    "mean_plate_confidence": 0.7999,
+    "mean_ocr_confidence": 0.8093
+  },
+  "events": [
+    {
+      "track_id": 2,
+      "vehicle_class": "car",
+      "plate": "EZV0448",
+      "pattern": "antigo",
+      "det_confidence": 0.7567820151646932,
+      "ocr_confidence": 0.8639666666666667,
+      "first_frame_idx": 0,
+      "last_frame_idx": 24,
+      "timestamp_sec": 0.40040000000000003,
+      "bbox_plate": [
+        1027,
+        701,
+        1165,
+        746
+      ],
+      "total_hits": 3
+    },
+    {
+      "track_id": 3,
+      "vehicle_class": "car",
+      "plate": "TEK3J37",
+      "pattern": "mercosul",
+      "det_confidence": 0.8175737063090006,
+      "ocr_confidence": 0.9211333333333332,
+      "first_frame_idx": 162,
+      "last_frame_idx": 210,
+      "timestamp_sec": 3.5035000000000003,
+      "bbox_plate": [
+        1049,
+        677,
+        1184,
+        715
+      ],
+      "total_hits": 3
+    },
+    {
+      "track_id": 4,
+      "vehicle_class": "car",
+      "plate": "FWW7994",
+      "pattern": "antigo",
+      "det_confidence": 0.8285054100672404,
+      "ocr_confidence": 0.9522333333333334,
+      "first_frame_idx": 336,
+      "last_frame_idx": 378,
+      "timestamp_sec": 6.3063,
+      "bbox_plate": [
+        1067,
+        676,
+        1182,
+        702
+      ],
+      "total_hits": 3
+    },
+    {
+      "track_id": 5,
+      "vehicle_class": "car",
+      "plate": "HFT8923",
+      "pattern": "antigo",
+      "det_confidence": 0.610819415473938,
+      "ocr_confidence": 0.9211333333333332,
+      "first_frame_idx": 531,
+      "last_frame_idx": 561,
+      "timestamp_sec": 9.359350000000001,
+      "bbox_plate": [
+        969,
+        660,
+        1132,
+        695
+      ],
+      "total_hits": 3
+    },
+    {
+      "track_id": 6,
+      "vehicle_class": "car",
+      "plate": "FTN1F16",
+      "pattern": "mercosul",
+      "det_confidence": 0.8788343270619711,
+      "ocr_confidence": 0.8664999999999999,
+      "first_frame_idx": 792,
+      "last_frame_idx": 828,
+      "timestamp_sec": 13.8138,
+      "bbox_plate": [
+        1023,
+        696,
+        1160,
+        734
+      ],
+      "total_hits": 3
+    },
+    {
+      "track_id": 8,
+      "vehicle_class": "car",
+      "plate": "GDI3B67",
+      "pattern": "mercosul",
+      "det_confidence": 0.9062545498212179,
+      "ocr_confidence": 0.7230666666666666,
+      "first_frame_idx": 1008,
+      "last_frame_idx": 1041,
+      "timestamp_sec": 17.367350000000002,
+      "bbox_plate": [
+        908,
+        786,
+        1090,
+        838
+      ],
+      "total_hits": 3
+    }
+  ]
+}

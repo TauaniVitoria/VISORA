@@ -232,25 +232,25 @@ import { Cobranca } from '../../core/models/models';
       color: #475569;
       font-weight: 500;
       &.active {
-        background: #0284c7;
+        background: #d97706;
         color: #ffffff;
-        border-color: #0284c7;
+        border-color: #d97706;
       }
     }
     .btn-refresh {
       background: #ffffff;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #d6d3d1;
       padding: 0.45rem 1rem;
       border-radius: 6px;
       font-size: 0.85rem;
-      color: #334155;
+      color: #27272a;
       cursor: pointer;
-      &:hover { background: #f8fafc; }
+      &:hover { background: #fafaf9; }
     }
     .table-card {
       background: #ffffff;
       border-radius: 8px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e7e5e4;
       overflow-x: auto;
     }
     .data-table {
@@ -258,17 +258,17 @@ import { Cobranca } from '../../core/models/models';
       border-collapse: collapse;
       font-size: 0.875rem;
       th {
-        background: #f8fafc;
-        color: #475569;
+        background: #fafaf9;
+        color: #52525b;
         font-weight: 600;
         text-align: left;
         padding: 0.85rem 1rem;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e7e5e4;
       }
       td {
         padding: 0.85rem 1rem;
-        border-bottom: 1px solid #f1f5f9;
-        color: #1e293b;
+        border-bottom: 1px solid #f5f5f4;
+        color: #18181b;
       }
       tr:last-child td { border-bottom: none; }
     }
@@ -287,7 +287,7 @@ import { Cobranca } from '../../core/models/models';
       &.estornado { background: #e0e7ff; color: #4338ca; }
     }
     .btn-pay {
-      background: #0284c7;
+      background: #d97706;
       color: #ffffff;
       border: none;
       padding: 0.35rem 0.75rem;
@@ -295,7 +295,7 @@ import { Cobranca } from '../../core/models/models';
       font-size: 0.8rem;
       cursor: pointer;
       font-weight: 500;
-      &:hover { background: #0369a1; }
+      &:hover { background: #b45309; }
     }
     .alert {
       padding: 0.75rem 1rem;

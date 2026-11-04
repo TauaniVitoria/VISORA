@@ -1,0 +1,42 @@
+{
+  "frame_idx": 1035,
+  "vehicle": {
+    "class": "car",
+    "confidence": 0.8887,
+    "bbox": [
+      698,
+      412,
+      1299,
+      919
+    ]
+  },
+  "plate_detection": {
+    "confidence": 0.9122,
+    "bbox_global": [
+      915,
+      777,
+      1092,
+      827
+    ],
+    "bbox_local": [
+      217,
+      365,
+      394,
+      415
+    ],
+    "aspect_ratio": 3.54
+  },
+  "ocr": {
+    "raw_text": "GDI3B67",
+    "recognized_text": "GDI3B67",
+    "confidence": 0.7062,
+    "model_used": "easyocr",
+    "is_trained_weights": true
+  },
+  "validation": {
+    "is_valid": true,
+    "normalized_plate": "GDI3B67",
+    "pattern": "mercosul",
+    "error_message": null
+  }
+}

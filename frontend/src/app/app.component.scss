@@ -3,7 +3,7 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background-color: #f8fafc;
+  background-color: #fafaf9;
 }
 
 .layout-body {
@@ -20,14 +20,12 @@ app-sidebar {
 .content-container {
   flex: 1;
   overflow-y: auto;
-  background-color: #f8fafc;
+  background-color: #fafaf9;
 }
 
 .auth-wrapper {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #0f172a;
+  width: 100%;
+  display: block;
 }
 

@@ -13,7 +13,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       <div class="page-header">
         <div>
           <h2>Dashboard Operacional</h2>
-          <p class="subtitle">Monitoramento em tempo real do pátio e inteligência ALPR</p>
+          <p class="subtitle">Monitoramento em tempo real do pátio</p>
         </div>
         <button class="btn-refresh" (click)="loadData()">
           <span>Atualizar Dados</span>
@@ -24,9 +24,9 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       <div class="kpi-grid">
         <div class="kpi-card highlight">
           <div class="kpi-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
               <rect x="3" y="3" width="18" height="18" rx="4"></rect>
-              <path d="M9 17V7h4a3 3 0 0 1 0 6H9"></path>
+              <path d="M7 7l5 10 5-10"></path>
             </svg>
           </div>
           <div class="kpi-data">
@@ -50,7 +50,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
 
         <div class="kpi-card">
           <div class="kpi-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
@@ -64,7 +64,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
 
       <!-- Quick Actions for ALPR / Manual Simulation -->
       <div class="actions-card">
-        <h3>Ações Rápidas de Portaria e Reconhecimento ALPR</h3>
+        <h3>Ações Rápidas de Portaria</h3>
         <div class="actions-form">
           <div class="action-box">
             <label>Registrar Entrada (Veículo)</label>
@@ -201,11 +201,11 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .kpi-card.highlight {
-      border-left: 4px solid #0284c7;
+      border-left: 4px solid #d97706;
     }
     .kpi-icon {
       font-size: 2rem;
-      background: #f8fafc;
+      background: #fafaf9;
       width: 50px;
       height: 50px;
       display: flex;
@@ -220,24 +220,24 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
     .kpi-label {
       font-size: 0.75rem;
       font-weight: 600;
-      color: #64748b;
+      color: #71717a;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
     .kpi-value {
       font-size: 1.45rem;
       font-weight: 700;
-      color: #0f172a;
+      color: #18181b;
       margin-top: 0.2rem;
     }
     .text-green { color: #16a34a; }
-    .text-blue { color: #0284c7; }
+    .text-blue { color: #d97706; }
     .text-emerald { color: #059669; }
     .text-amber { color: #d97706; }
 
     .actions-card, .content-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e7e5e4;
       border-radius: 12px;
       padding: 1.5rem;
       margin-bottom: 1.75rem;
@@ -247,7 +247,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       margin: 0 0 1rem;
       font-size: 1.05rem;
       font-weight: 700;
-      color: #1e293b;
+      color: #18181b;
     }
     .actions-form {
       display: grid;
@@ -261,7 +261,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       display: block;
       font-size: 0.8rem;
       font-weight: 600;
-      color: #475569;
+      color: #52525b;
       margin-bottom: 0.35rem;
     }
     .input-action-group {
@@ -271,7 +271,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
     .plate-input {
       flex: 1;
       padding: 0.65rem 0.85rem;
-      border: 2px solid #cbd5e1;
+      border: 2px solid #d6d3d1;
       border-radius: 8px;
       font-weight: 700;
       font-size: 1rem;
@@ -280,10 +280,10 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       letter-spacing: 0.1em;
     }
     .plate-input:focus {
-      border-color: #0284c7;
+      border-color: #d97706;
     }
     .btn-action-in {
-      background: #0284c7;
+      background: #d97706;
       color: white;
       border: none;
       padding: 0 1.25rem;
@@ -292,7 +292,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       cursor: pointer;
       transition: background 0.15s;
     }
-    .btn-action-in:hover { background: #0369a1; }
+    .btn-action-in:hover { background: #b45309; }
     .btn-action-out {
       background: #dc2626;
       color: white;
@@ -329,8 +329,8 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       margin-bottom: 1rem;
     }
     .badge-count {
-      background: #e0f2fe;
-      color: #0369a1;
+      background: #fef3c7;
+      color: #b45309;
       padding: 0.25rem 0.6rem;
       border-radius: 999px;
       font-size: 0.75rem;
@@ -345,23 +345,23 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       text-align: left;
     }
     .data-table th {
-      background: #f8fafc;
-      color: #64748b;
+      background: #fafaf9;
+      color: #71717a;
       font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
       padding: 0.75rem 1rem;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e7e5e4;
     }
     .data-table td {
       padding: 0.85rem 1rem;
-      border-bottom: 1px solid #f1f5f9;
-      color: #1e293b;
+      border-bottom: 1px solid #f5f5f4;
+      color: #18181b;
       font-size: 0.875rem;
     }
     .plate-badge {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
+      background: #f5f5f4;
+      border: 1px solid #d6d3d1;
       padding: 0.2rem 0.5rem;
       border-radius: 6px;
       font-weight: 700;
@@ -374,8 +374,8 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       border-radius: 4px;
     }
     .charge-type-badge.plano {
-      background: #dbeafe;
-      color: #1d4ed8;
+      background: #fef3c7;
+      color: #b45309;
     }
     .charge-type-badge.avulsa {
       background: #fef3c7;
@@ -391,8 +391,8 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
     }
     .btn-table-action {
       background: #ffffff;
-      color: #0284c7;
-      border: 1px solid #0284c7;
+      color: #d97706;
+      border: 1px solid #d97706;
       padding: 0.35rem 0.75rem;
       border-radius: 6px;
       font-weight: 600;
@@ -400,7 +400,7 @@ import { DashboardMetrics, Movimentacao } from '../../core/models/models';
       cursor: pointer;
     }
     .btn-table-action:hover {
-      background: #e0f2fe;
+      background: #fef3c7;
     }
     .empty-state {
       padding: 2rem;

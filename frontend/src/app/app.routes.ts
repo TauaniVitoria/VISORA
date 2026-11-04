@@ -3,6 +3,17 @@ import { clienteGuard, staffGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
+    path: '',
+    loadComponent: () =>
+      import('./features/landing/landing.component').then((m) => m.LandingComponent),
+    pathMatch: 'full',
+  },
+  {
+    path: 'apresentacao',
+    loadComponent: () =>
+      import('./features/landing/landing.component').then((m) => m.LandingComponent),
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./features/auth/login/login.component').then((m) => m.LoginComponent),
@@ -34,19 +45,19 @@ export const routes: Routes = [
     canActivate: [staffGuard],
   },
   {
-    path: 'alpr',
+    path: 'central',
     loadComponent: () =>
       import('./features/alpr/alpr.component').then((m) => m.AlprComponent),
     canActivate: [staffGuard],
   },
   {
-    path: 'customers',
+    path: 'clientes',
     loadComponent: () =>
       import('./features/customers/customers.component').then((m) => m.CustomersComponent),
     canActivate: [staffGuard],
   },
   {
-    path: 'tariffs-plans',
+    path: 'tarifas',
     loadComponent: () =>
       import('./features/tariffs-plans/tariffs-plans.component').then(
         (m) => m.TariffsPlansComponent
@@ -54,7 +65,7 @@ export const routes: Routes = [
     canActivate: [staffGuard],
   },
   {
-    path: 'history',
+    path: 'historico',
     loadComponent: () =>
       import('./features/movements/movements.component').then((m) => m.MovementsComponent),
     canActivate: [staffGuard],
@@ -72,12 +83,7 @@ export const routes: Routes = [
     canActivate: [staffGuard],
   },
   {
-    path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full',
-  },
-  {
     path: '**',
-    redirectTo: 'dashboard',
+    redirectTo: '',
   },
 ];

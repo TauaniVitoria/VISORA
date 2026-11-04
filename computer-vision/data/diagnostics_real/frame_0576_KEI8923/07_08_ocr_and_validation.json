@@ -1,0 +1,42 @@
+{
+  "frame_idx": 576,
+  "vehicle": {
+    "class": "car",
+    "confidence": 0.7751,
+    "bbox": [
+      959,
+      394,
+      1278,
+      734
+    ]
+  },
+  "plate_detection": {
+    "confidence": 0.419,
+    "bbox_global": [
+      1025,
+      678,
+      1132,
+      705
+    ],
+    "bbox_local": [
+      66,
+      284,
+      173,
+      311
+    ],
+    "aspect_ratio": 3.963
+  },
+  "ocr": {
+    "raw_text": "KEI8923",
+    "recognized_text": "KEI8923",
+    "confidence": 0.4016,
+    "model_used": "easyocr",
+    "is_trained_weights": true
+  },
+  "validation": {
+    "is_valid": true,
+    "normalized_plate": "KEI8923",
+    "pattern": "antigo",
+    "error_message": null
+  }
+}

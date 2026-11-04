@@ -15,7 +15,7 @@ type SortDirection = 'asc' | 'desc';
     <div class="movements-page">
       <div class="page-header">
         <div>
-          <h2>Histórico de Movimentações ALPR</h2>
+          <h2>Histórico de Movimentações</h2>
           <p class="subtitle">Auditoria de passagens capturadas pelas câmeras, tempos de permanência e bilhetagem</p>
         </div>
       </div>
@@ -228,17 +228,18 @@ type SortDirection = 'asc' | 'desc';
     }
     .uppercase { text-transform: uppercase; }
     .btn-filter {
-      background: #0284c7; color: white; border: none; padding: 0.6rem 1.25rem;
+      background: #d97706; color: white; border: none; padding: 0.6rem 1.25rem;
       border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem;
     }
+    .btn-filter:hover { background: #b45309; }
     .content-card {
-      background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;
+      background: #ffffff; border: 1px solid #e7e5e4; border-radius: 12px;
       padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .data-table { width: 100%; border-collapse: collapse; text-align: left; }
     .data-table th {
-      background: #f8fafc; color: #64748b; font-size: 0.75rem; font-weight: 700;
-      text-transform: uppercase; padding: 0.75rem 1rem; border-bottom: 1px solid #e2e8f0;
+      background: #fafaf9; color: #71717a; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; padding: 0.75rem 1rem; border-bottom: 1px solid #e7e5e4;
       user-select: none;
     }
     .sortable-th {
@@ -246,64 +247,65 @@ type SortDirection = 'asc' | 'desc';
       transition: background 0.15s, color 0.15s;
     }
     .sortable-th:hover {
-      background: #f1f5f9;
-      color: #0f172a;
+      background: #f5f5f4;
+      color: #18181b;
     }
     .sort-indicator {
       display: inline-block;
       margin-left: 0.35rem;
       font-size: 0.7rem;
-      color: #0284c7;
+      color: #d97706;
     }
     .data-table td {
-      padding: 0.85rem 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.875rem; color: #1e293b;
+      padding: 0.85rem 1rem; border-bottom: 1px solid #f5f5f4; font-size: 0.875rem; color: #18181b;
     }
     .plate-badge {
-      background: #f1f5f9; border: 1px solid #cbd5e1; padding: 0.2rem 0.5rem;
+      background: #f5f5f4; border: 1px solid #d6d3d1; padding: 0.2rem 0.5rem;
       border-radius: 6px; font-weight: 700; font-family: monospace;
     }
     .charge-type-badge { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; }
-    .charge-type-badge.plano { background: #dbeafe; color: #1d4ed8; }
+    .charge-type-badge.plano { background: #fef3c7; color: #b45309; }
     .charge-type-badge.avulsa { background: #fef3c7; color: #b45309; }
     .status-badge { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; }
     .status-badge.aberta { background: #dcfce7; color: #15803d; }
-    .status-badge.concluida { background: #f1f5f9; color: #475569; }
+    .status-badge.concluida { background: #f5f5f4; color: #52525b; }
     .status-badge.inconsistente { background: #fee2e2; color: #b91c1c; }
     .status-badge.cancelada { background: #f3f4f6; color: #9ca3af; }
     .btn-action-edit {
-      background: #f1f5f9; border: 1px solid #cbd5e1; color: #0284c7;
+      background: #fafaf9; border: 1px solid #d6d3d1; color: #d97706;
       padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
     }
-    .btn-action-edit:hover { background: #e0f2fe; }
-    .text-muted { color: #64748b; font-weight: 600; }
+    .btn-action-edit:hover { background: #fef3c7; }
+    .text-muted { color: #71717a; font-weight: 600; }
 
     /* Modais */
     .modal-backdrop {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000;
+      background: rgba(9, 9, 11, 0.65); display: flex; align-items: center; justify-content: center; z-index: 1000;
     }
     .modal-content {
       background: #ffffff; border-radius: 12px; width: 100%; max-width: 500px; overflow: hidden;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
     }
     .modal-header {
-      display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border-bottom: 1px solid #e2e8f0;
+      display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border-bottom: 1px solid #e7e5e4;
     }
-    .modal-header h3 { margin: 0; font-size: 1.1rem; color: #0f172a; }
-    .btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748b; }
+    .modal-header h3 { margin: 0; font-size: 1.1rem; color: #18181b; }
+    .btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #71717a; }
     .modal-body { padding: 1.25rem; }
     .audit-warning {
       background: #fef3c7; border: 1px solid #fde68a; color: #92400e;
       padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; margin: 0 0 1rem;
     }
     .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem; }
+    .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #52525b; margin-bottom: 0.25rem; }
     .modal-footer {
-      padding: 1rem 1.25rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 0.75rem; background: #f8fafc;
+      padding: 1rem 1.25rem; border-top: 1px solid #e7e5e4; display: flex; justify-content: flex-end; gap: 0.75rem; background: #fafaf9;
     }
     .btn-primary {
-      background: #0284c7; color: white; border: none; padding: 0.55rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer;
+      background: #d97706; color: white; border: none; padding: 0.55rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer;
     }
+    .btn-primary:hover { background: #b45309; }
     .btn-secondary {
       background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 0.55rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer;
     }
